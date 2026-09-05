@@ -1,7 +1,64 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
+const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID') ?? ''
+const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN') ?? ''
+const TWILIO_WHATSAPP_FROM = Deno.env.get('TWILIO_WHATSAPP_FROM') ?? 'whatsapp:+14155238886'
+
+/**
+ * Normaliza el texto de respuesta del cliente para detectar SI o NO
+ */
+function parseKeywordIntent(rawText: string): 'SI' | 'NO' | 'UNKNOWN' {
+  const normalized = rawText
+    .trim()
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Quitar tildes: SÍ -> SI
+    .replace(/[^\w\s]/gi, '')        // Quitar signos de puntuación
+
+  // Patrones afirmativos
+  const affirmativeWords = ['SI', 'S', 'CONFIRMO', 'CONFIRMAR', 'CONFIRMADO', 'OK', 'DALE', 'CLARO', '1', 'YES', 'Y']
+  if (affirmativeWords.includes(normalized) || normalized.startsWith('SI ') || normalized.includes('CONFIRMO')) {
+    return 'SI'
+  }
+
+  // Patrones negativos
+  const negativeWords = ['NO', 'N', 'CANCELO', 'CANCELAR', 'CANCELADO', '2', 'NO PUEDO', 'NOT']
+  if (negativeWords.includes(normalized) || normalized.startsWith('NO ') || normalized.includes('CANCELO')) {
+    return 'NO'
+  }
+
+  return 'UNKNOWN'
+}
+
+/**
+ * Enviar mensaje de respuesta por WhatsApp
+ */
+async function sendWhatsAppReply(toPhone: string, message: string) {
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+    console.log('[Webhook Reply Simulado]:', { to: toPhone, message })
+    return
+  }
+
+  let formattedTo = toPhone.replace(/\D/g, '')
+  if (formattedTo.length === 8) formattedTo = '506' + formattedTo
+
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`
+  const params = new URLSearchParams({
+    From: TWILIO_WHATSAPP_FROM,
+    To: `whatsapp:+${formattedTo}`,
+    Body: message,
+  })
+
+  await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Basic ' + btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params.toString(),
+  })
+}
 
 serve(async (req) => {
   try {
@@ -10,101 +67,125 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Twilio/Meta usualmente envían los datos como form-urlencoded o JSON
-    const bodyText = await req.text()
-    // Parche simple para extraer el teléfono y mensaje, asumiendo JSON de ejemplo
-    // En prod dependría del proveedor exacto
-    const data = JSON.parse(bodyText || "{}")
-    const fromPhone = data.From || data.phone
-    const incomingMsg = data.Body || data.message
+    let senderPhone = ''
+    let messageBody = ''
 
-    if (!fromPhone || !incomingMsg) {
-      return new Response("Missing parameters", { status: 400 })
+    const contentType = req.headers.get('content-type') || ''
+
+    if (contentType.includes('application/x-www-form-urlencoded')) {
+      // Formato Twilio Webhook
+      const formData = await req.formData()
+      senderPhone = formData.get('From')?.toString() || ''
+      messageBody = formData.get('Body')?.toString() || ''
+    } else {
+      // Formato JSON (Meta Cloud API, test requests o Evolution API)
+      const bodyText = await req.text()
+      try {
+        const json = JSON.parse(bodyText || '{}')
+        // Meta Cloud API
+        if (json.entry?.[0]?.changes?.[0]?.value?.messages?.[0]) {
+          const msg = json.entry[0].changes[0].value.messages[0]
+          senderPhone = msg.from || ''
+          messageBody = msg.text?.body || ''
+        } else {
+          // Genérico
+          senderPhone = json.From || json.phone || json.from || ''
+          messageBody = json.Body || json.message || json.text || ''
+        }
+      } catch {
+        // Fallback
+      }
     }
 
-    // 1. Encontrar al cliente por teléfono
-    const { data: clients, error: clientError } = await supabaseClient
-      .from('clients')
-      .select('id')
-      .eq('telefono', fromPhone)
-    
-    if (clientError || !clients || clients.length === 0) {
-      return new Response("Client not found", { status: 200 })
-    }
-    
-    const clientId = clients[0].id
+    // Extraer solo dígitos del teléfono (últimos 8 dígitos para Costa Rica o número completo)
+    const digitsOnly = senderPhone.replace(/\D/g, '')
+    const localPhone = digitsOnly.slice(-8)
 
-    // 2. Encontrar la cita más reciente pendiente de este cliente
-    const { data: appts, error: apptError } = await supabaseClient
-      .from('appointments')
+    console.log(`[Webhook] Mensaje recibido de ${senderPhone} (${localPhone}): "${messageBody}"`)
+
+    if (!localPhone || !messageBody) {
+      return new Response("Missing phone or message", { status: 400 })
+    }
+
+    const intent = parseKeywordIntent(messageBody)
+    console.log(`[Webhook] Intención detectada: ${intent}`)
+
+    // Buscar la cita pendiente más próxima para este teléfono
+    const { data: appointments, error } = await supabaseClient
+      .from('user_appointments')
       .select('*')
-      .eq('client_id', clientId)
+      .ilike('telefono', `%${localPhone}%`)
       .eq('estado', 'pendiente')
       .order('fecha_hora', { ascending: true })
       .limit(1)
 
-    if (apptError || !appts || appts.length === 0) {
-      return new Response("No pending appointments", { status: 200 })
+    if (error) {
+      console.error('[Webhook] Error consultando citas:', error)
+      return new Response("Database error", { status: 500 })
     }
 
-    const appointment = appts[0]
-
-    // 3. Consultar a GPT-4o-mini para entender la intención
-    const prompt = `
-      Eres un asistente de reservas. El cliente ha respondido a un recordatorio de cita.
-      Su mensaje es: "${incomingMsg}"
-      Clasifica su intención estrictamente en formato JSON con dos campos:
-      - "intent": "CONFIRMADO", "CANCELADO" o "REPROGRAMACION"
-      - "suggested_date": String con la fecha/hora que sugiere, o null si no sugiere ninguna.
-    `
-
-    const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" }
+    if (!appointments || appointments.length === 0) {
+      console.log(`[Webhook] No se encontró cita pendiente para el número ${localPhone}`)
+      await sendWhatsAppReply(senderPhone, "Hola. No encontramos una cita pendiente asociada a este número en Calendario Inteligente.")
+      return new Response(JSON.stringify({ status: "no_pending_appointment" }), {
+        headers: { "Content-Type": "application/json" },
+        status: 200,
       })
-    })
-
-    const aiResult = await aiResponse.json()
-    const parsedIntent = JSON.parse(aiResult.choices[0].message.content)
-
-    // 4. Actualizar la base de datos según la intención
-    let newStatus = 'pendiente'
-    if (parsedIntent.intent === 'CONFIRMADO') newStatus = 'confirmado'
-    else if (parsedIntent.intent === 'CANCELADO') newStatus = 'cancelado'
-    else if (parsedIntent.intent === 'REPROGRAMACION') newStatus = 'reprogramando'
-
-    await supabaseClient
-      .from('appointments')
-      .update({ estado: newStatus })
-      .eq('id', appointment.id)
-
-    // 5. Registrar la interacción
-    await supabaseClient
-      .from('reminder_logs')
-      .update({ respuesta_cliente: incomingMsg })
-      .eq('appointment_id', appointment.id)
-      .eq('canal', 'whatsapp')
-
-    // 6. Notificar al negocio (simulado)
-    if (newStatus === 'reprogramando') {
-      console.log(`Alertar al negocio: el cliente quiere reprogramar para ${parsedIntent.suggested_date}`)
-      // Aquí se enviaría un email o push notification
     }
 
-    return new Response(JSON.stringify({ success: true, intent: parsedIntent.intent }), {
-      headers: { "Content-Type": "application/json" },
-      status: 200,
-    })
+    const appt = appointments[0]
+    const dt = new Date(appt.fecha_hora)
+    const timeStr = dt.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit', hour12: true })
+
+    if (intent === 'SI') {
+      // 1. CONFIRMAR LA CITA
+      await supabaseClient
+        .from('user_appointments')
+        .update({
+          estado: 'confirmado',
+          reminder_response: `SI: "${messageBody}"`,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', appt.id)
+
+      const replyMsg = `¡Muchas gracias ${appt.nombre}! Tu cita para *${appt.servicio}* a las ${timeStr} ha sido CONFIRMADA con éxito. ✅ ¡Te esperamos!`
+      await sendWhatsAppReply(senderPhone, replyMsg)
+
+      return new Response(JSON.stringify({ success: true, action: "confirmed", appointment_id: appt.id }), {
+        headers: { "Content-Type": "application/json" },
+        status: 200,
+      })
+    } else if (intent === 'NO') {
+      // 2. CANCELAR LA CITA
+      await supabaseClient
+        .from('user_appointments')
+        .update({
+          estado: 'cancelado',
+          reminder_response: `NO: "${messageBody}"`,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', appt.id)
+
+      const replyMsg = `Entendido ${appt.nombre}. Tu cita para *${appt.servicio}* ha sido CANCELADA. ❌ Si deseas reprogramar en otra fecha, avísanos con gusto.`
+      await sendWhatsAppReply(senderPhone, replyMsg)
+
+      return new Response(JSON.stringify({ success: true, action: "cancelled", appointment_id: appt.id }), {
+        headers: { "Content-Type": "application/json" },
+        status: 200,
+      })
+    } else {
+      // 3. RESPUESTA NO RECONOCIDA -> GUÍA AL CLIENTE
+      const replyMsg = `Hola ${appt.nombre}, para gestionar tu cita de mañana para *${appt.servicio}*, responde por favor únicamente:\n👉 *SI* para confirmar tu asistencia\n👉 *NO* para cancelar tu cita`
+      await sendWhatsAppReply(senderPhone, replyMsg)
+
+      return new Response(JSON.stringify({ success: false, action: "unrecognized_intent" }), {
+        headers: { "Content-Type": "application/json" },
+        status: 200,
+      })
+    }
 
   } catch (error) {
-    console.error(error)
+    console.error('[Webhook] Error general:', error)
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { "Content-Type": "application/json" },
       status: 500,

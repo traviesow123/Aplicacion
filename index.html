@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Agenda IA — Tu Asistente de Citas Inteligente</title>
-  <meta name="description" content="Gestiona tus citas con inteligencia artificial. Recordatorios por WhatsApp y agenda inteligente para tu negocio en Costa Rica.">
+  <title>Calendario Inteligente</title>
+  <meta name="description" content="Gestiona tus citas con tu calendario inteligente. Recordatorios automáticos por WhatsApp y correo para tu negocio.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -404,6 +404,33 @@
     }
     .btn-wa:hover { background: var(--accent-whatsapp); color: #000; transform: scale(1.1); box-shadow: 0 0 20px rgba(37,211,102,0.4); }
 
+    .btn-mail {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(192, 132, 252, 0.12); border: 1px solid rgba(192, 132, 252, 0.3);
+      color: var(--accent-secondary); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all var(--transition-fast); text-decoration: none;
+    }
+    .btn-mail:hover { background: var(--accent-secondary); color: #000; transform: scale(1.1); box-shadow: 0 0 20px rgba(192, 132, 252, 0.4); }
+
+    .badge-optional {
+      font-size: 10px; font-weight: 600; text-transform: none;
+      color: var(--text-muted); background: rgba(255, 255, 255, 0.06);
+      padding: 2px 8px; border-radius: 6px;
+    }
+    .appt-email {
+      font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; margin-top: 2px;
+    }
+    .appt-reminder-status {
+      font-size: 10px; font-weight: 700; color: var(--accent-primary);
+      background: rgba(212, 168, 83, 0.12); border: 1px solid rgba(212, 168, 83, 0.25);
+      border-radius: 6px; padding: 2px 7px; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .appt-response-badge {
+      font-size: 10px; font-weight: 700; color: var(--accent-teal);
+      background: rgba(78, 205, 196, 0.12); border: 1px solid rgba(78, 205, 196, 0.25);
+      border-radius: 6px; padding: 2px 7px; display: inline-flex; align-items: center; gap: 4px;
+    }
+
     .btn-status-toggle {
       width: 40px; height: 40px; border-radius: 50%;
       background: rgba(212,168,83,0.08); border: 1px solid rgba(212,168,83,0.2);
@@ -739,7 +766,7 @@
   <!-- LOADING OVERLAY -->
   <div id="loading-overlay" class="loading-overlay">
     <div class="loading-spinner"></div>
-    <div class="loading-text">Cargando Agenda IA...</div>
+    <div class="loading-text">Cargando Calendario Inteligente...</div>
   </div>
 
   <!-- AUTH SCREEN -->
@@ -752,7 +779,7 @@
             <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
         </div>
-        <h1>Agenda IA</h1>
+        <h1>Calendario Inteligente</h1>
         <p>Tu asistente de citas inteligente</p>
       </div>
 
@@ -915,6 +942,16 @@
             </div>
           </div>
           <div class="form-group">
+            <div class="form-label">
+              <span>Correo Electrónico</span>
+              <span class="badge-optional">Opcional</span>
+            </div>
+            <div class="input-wrap">
+              <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+              <input type="email" id="inp-email" class="form-input" placeholder="cliente@correo.com (Opcional)">
+            </div>
+          </div>
+          <div class="form-group">
             <div class="form-label"><span>Fecha y Hora</span></div>
             <div class="input-wrap">
               <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
@@ -963,13 +1000,13 @@
         <div class="config-section">
           <div class="config-section-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            Recordatorios
+            Recordatorios Automáticos (1 Día Antes)
           </div>
           <div class="config-card">
             <div class="toggle-row">
               <div class="toggle-info">
-                <div class="toggle-label">Recordatorio por WhatsApp</div>
-                <div class="toggle-desc">Te avisa de las citas dentro de 24 horas para que les mandés un mensaje al cliente.</div>
+                <div class="toggle-label">Envío Automático (24h antes)</div>
+                <div class="toggle-desc">El sistema envía WhatsApp y correo automáticamente 1 día antes sin que tengás que abrir WhatsApp. Además procesa respuestas con palabras clave (*SI* / *NO*).</div>
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" id="toggle-reminder" onchange="toggleReminder()">
@@ -977,9 +1014,13 @@
               </label>
             </div>
             <div id="reminder-template-area" class="reminder-template">
-              <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Mensaje de recordatorio</label>
-              <textarea id="reminder-msg-template" oninput="saveReminderTemplate()">Hola {nombre}, te recordamos tu cita para *{servicio}* mañana a las {hora}. ¿Confirmás tu asistencia?</textarea>
-              <div class="hint">Usá {nombre}, {servicio} y {hora} como variables.</div>
+              <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Mensaje de recordatorio automático</label>
+              <textarea id="reminder-msg-template" oninput="saveReminderTemplate()">Hola {nombre}, te recordamos tu cita para *{servicio}* mañana a las {hora}.
+
+¿Confirmás tu asistencia?
+👉 Respondé *SI* para confirmar
+👉 Respondé *NO* para cancelar</textarea>
+              <div class="hint">Variables: {nombre}, {servicio}, {hora}. Si el cliente responde SI o NO, el estado de la cita se actualiza solo.</div>
             </div>
           </div>
         </div>
@@ -1033,7 +1074,7 @@
     let cachedServices = [];
     let cachedSettings = null;
 
-    const DEFAULT_REMINDER_MSG = 'Hola {nombre}, te recordamos tu cita para *{servicio}* mañana a las {hora}. ¿Confirmás tu asistencia?';
+    const DEFAULT_REMINDER_MSG = 'Hola {nombre}, te recordamos tu cita para *{servicio}* mañana a las {hora}.\n\n¿Confirmás tu asistencia?\n👉 Respondé *SI* para confirmar\n👉 Respondé *NO* para cancelar';
 
     // ═══════════════════════════════════════════
     // AUTH FUNCTIONS
@@ -1198,6 +1239,7 @@
           user_id: uid,
           nombre: c.nombre,
           telefono: c.telefono || null,
+          email: c.email || null,
         }));
         const { error } = await sb.from('user_clients').upsert(clientRows, { onConflict: 'user_id,nombre', ignoreDuplicates: true });
         if (!error) migrated += clientRows.length;
@@ -1221,8 +1263,10 @@
           nombre: a.nombre,
           servicio: a.servicio,
           telefono: a.telefono || null,
+          email: a.email || null,
           fecha_hora: a.fecha_hora,
           estado: a.estado || 'pendiente',
+          reminder_sent: false,
           created_at: a.created_at || new Date().toISOString(),
           updated_at: a.updated_at || new Date().toISOString(),
         }));
@@ -1231,13 +1275,14 @@
       }
 
       // Migrate settings
-      const reminderEnabled = (() => { try { return JSON.parse(localStorage.getItem('agendaia_reminder_enabled')); } catch { return false; } })();
+      const reminderEnabled = (() => { try { return JSON.parse(localStorage.getItem('agendaia_reminder_enabled')); } catch { return true; } })();
       const reminderTemplate = localStorage.getItem('agendaia_reminder_template');
-      if (reminderEnabled || reminderTemplate) {
+      if (reminderEnabled !== null || reminderTemplate) {
         await sb.from('user_settings').upsert({
           user_id: uid,
-          reminder_enabled: reminderEnabled === true,
+          reminder_enabled: reminderEnabled !== false,
           reminder_template: reminderTemplate || DEFAULT_REMINDER_MSG,
+          email_reminder_enabled: true,
         });
       }
 
@@ -1266,8 +1311,10 @@
         nombre: appt.nombre,
         servicio: appt.servicio,
         telefono: appt.telefono || null,
+        email: appt.email || null,
         fecha_hora: appt.fecha_hora,
         estado: 'pendiente',
+        reminder_sent: false,
       }).select().single();
       if (error) { console.error('insertAppointment:', error); return null; }
       cachedAppointments.push(data);
@@ -1305,15 +1352,15 @@
       return cachedClients;
     }
 
-    async function upsertClient(nombre, telefono) {
-      // Check if already exists by name
+    async function upsertClient(nombre, telefono, email) {
       const existing = cachedClients.find(c => c.nombre.toLowerCase() === nombre.toLowerCase());
       if (existing) {
-        if (telefono && existing.telefono !== telefono) {
-          await sb.from('user_clients')
-            .update({ telefono })
-            .eq('id', existing.id);
-          existing.telefono = telefono;
+        const updates = {};
+        if (telefono && existing.telefono !== telefono) updates.telefono = telefono;
+        if (email && existing.email !== email) updates.email = email;
+        if (Object.keys(updates).length > 0) {
+          await sb.from('user_clients').update(updates).eq('id', existing.id);
+          Object.assign(existing, updates);
         }
         return existing;
       }
@@ -1321,9 +1368,9 @@
         user_id: currentUser.id,
         nombre,
         telefono: telefono || null,
+        email: email || null,
       }).select().single();
       if (error) {
-        // Might be duplicate, try to fetch
         if (error.code === '23505') {
           const { data: fetched } = await sb.from('user_clients')
             .select('*')
@@ -1497,18 +1544,22 @@
         const sl = appt.estado.charAt(0).toUpperCase()+appt.estado.slice(1);
         let ph = (appt.telefono||'').replace(/\D/g,'');
         if(ph.length===8) ph='506'+ph; else if(!ph.startsWith('506')&&ph.length>8) ph='506'+ph;
-        const wm = encodeURIComponent(`Hola ${appt.nombre}, te recordamos tu cita para *${appt.servicio}* el ${dateLabel} a las ${h}:${m} ${p}. ¿Confirmás tu asistencia?`);
+        const wm = encodeURIComponent(`Hola ${appt.nombre}, te recordamos tu cita para *${appt.servicio}* el ${dateLabel} a las ${h}:${m} ${p}.\n\n¿Confirmás tu asistencia?\n👉 Respondé *SI* para confirmar\n👉 Respondé *NO* para cancelar`);
         return `<div class="appt-card status-${appt.estado}">
           <div class="appt-time-block"><span class="time-h">${h}:${m}</span><span class="time-p">${p}</span></div>
           <div class="appt-details">
             <div class="appt-name">${appt.nombre}</div>
             <div class="appt-service">${appt.servicio}</div>
-            <span class="appt-status-badge badge-${appt.estado}">● ${sl}</span>
+            ${appt.email ? `<div class="appt-email"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>${appt.email}</div>` : ''}
+            <div style="display:flex; flex-wrap:wrap; gap:4px; align-items:center; margin-top:4px;">
+              <span class="appt-status-badge badge-${appt.estado}">● ${sl}</span>
+              ${appt.reminder_sent ? `<span class="appt-reminder-status" title="Recordatorio automático 24h enviado">🔔 24h Enviado</span>` : ''}
+              ${appt.reminder_response ? `<span class="appt-response-badge" title="Respuesta del cliente">💬 ${appt.reminder_response}</span>` : ''}
+            </div>
           </div>
           <div class="appt-actions">
-            <a href="https://wa.me/${ph}?text=${wm}" target="_blank" rel="noopener" class="btn-wa" title="WhatsApp">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            </a>
+            ${appt.telefono ? `<a href="https://wa.me/${ph}?text=${wm}" target="_blank" rel="noopener" class="btn-wa" title="WhatsApp"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>` : ''}
+            ${appt.email ? `<a href="mailto:${appt.email}?subject=${encodeURIComponent('Recordatorio de Cita - ' + appt.servicio)}&body=${wm}" class="btn-mail" title="Enviar Correo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>` : ''}
             <div class="btn-status-toggle" onclick="toggleStatusDropdown('${appt.id}',event)" title="Cambiar estado">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
               <div class="status-dropdown" id="dropdown-${appt.id}">
@@ -1606,10 +1657,15 @@
       if(v.length<2){b.classList.remove('open');return;}
       const cl=cachedClients.filter(c=>c.nombre.toLowerCase().includes(v.toLowerCase()));
       if(!cl.length){b.classList.remove('open');return;}
-      b.innerHTML=cl.map(c=>`<div class="ac-item" onclick="selectClient('${c.nombre.replace(/'/g,"\\'")}','${c.telefono||''}')"><div><span class="ac-name">${c.nombre}</span><span class="ac-phone">📱 ${c.telefono||'Sin teléfono'}</span></div></div>`).join('');
+      b.innerHTML=cl.map(c=>`<div class="ac-item" onclick="selectClient('${c.nombre.replace(/'/g,"\\'")}','${c.telefono||''}','${c.email||''}')"><div><span class="ac-name">${c.nombre}</span><span class="ac-phone">📱 ${c.telefono||'Sin teléfono'}</span>${c.email?`<span class="ac-email" style="font-size:11px;color:var(--text-muted);margin-left:6px;">✉️ ${c.email}</span>`:''}</div></div>`).join('');
       b.classList.add('open');
     }
-    function selectClient(n,p){document.getElementById('inp-name').value=n;if(p)document.getElementById('inp-phone').value=p;document.getElementById('ac-box').classList.remove('open');if(p)onPhoneInput(p);}
+    function selectClient(n,p,em){
+      document.getElementById('inp-name').value=n;
+      if(p){document.getElementById('inp-phone').value=p;onPhoneInput(p);}
+      if(em){document.getElementById('inp-email').value=em;}
+      document.getElementById('ac-box').classList.remove('open');
+    }
 
     // ═══════════════════════════════════════════
     // PHONE
@@ -1629,6 +1685,7 @@
       const name=document.getElementById('inp-name').value.trim();
       const svc=document.getElementById('inp-service').value.trim();
       const phone=document.getElementById('inp-phone').value.trim();
+      const email=document.getElementById('inp-email')?.value.trim() || '';
       const dt=document.getElementById('inp-datetime').value;
       if(!name){showToast('Ingresá el nombre del cliente',true);return;}
       if(!svc){showToast('Seleccioná o escribí un servicio',true);return;}
@@ -1638,6 +1695,7 @@
         nombre: name,
         servicio: svc,
         telefono: phone,
+        email: email || null,
         fecha_hora: new Date(dt).toISOString(),
       });
 
@@ -1647,10 +1705,11 @@
       }
 
       // Upsert client
-      await upsertClient(name, phone);
+      await upsertClient(name, phone, email || null);
 
       document.getElementById('inp-name').value='';document.getElementById('inp-service').value='';
-      document.getElementById('inp-phone').value='';document.getElementById('wa-pill').style.display='none';
+      document.getElementById('inp-phone').value='';if(document.getElementById('inp-email')) document.getElementById('inp-email').value='';
+      document.getElementById('wa-pill').style.display='none';
       document.querySelectorAll('.service-chip').forEach(c=>c.classList.remove('active'));
       setDefaultDateTime();
       showToast('¡Cita guardada exitosamente! ✨');
@@ -1664,12 +1723,12 @@
     function renderClients(query='') {
       const cl = cachedClients;
       const q = (query||document.getElementById('inp-search-client')?.value||'').toLowerCase();
-      const filtered = q ? cl.filter(c=>c.nombre.toLowerCase().includes(q)||(c.telefono||'').includes(q)) : cl;
+      const filtered = q ? cl.filter(c=>c.nombre.toLowerCase().includes(q)||(c.telefono||'').includes(q)||(c.email||'').toLowerCase().includes(q)) : cl;
       document.getElementById('client-count').textContent = `${cl.length} cliente${cl.length!==1?'s':''}`;
       const container = document.getElementById('client-list');
 
       if (filtered.length === 0) {
-        container.innerHTML = `<div class="empty-state"><div class="empty-icon">👤</div><h3>${q?'Sin resultados':'Sin clientes'}</h3><p>${q?'No se encontraron clientes con ese nombre.':'Los clientes se guardan automáticamente al crear citas.'}</p></div>`;
+        container.innerHTML = `<div class="empty-state"><div class="empty-icon">👤</div><h3>${q?'Sin resultados':'Sin clientes'}</h3><p>${q?'No se encontraron clientes con ese criterio.':'Los clientes se guardan automáticamente al crear citas.'}</p></div>`;
         return;
       }
 
@@ -1685,16 +1744,17 @@
         if(ph.length===8) ph='506'+ph; else if(!ph.startsWith('506')&&ph.length>8) ph='506'+ph;
         const waUrl = `https://wa.me/${ph}`;
 
-        return `<div class="client-card" onclick="createApptForClient('${c.nombre.replace(/'/g,"\\'")}','${c.telefono||''}')">
+        return `<div class="client-card" onclick="createApptForClient('${c.nombre.replace(/'/g,"\\'")}','${c.telefono||''}','${c.email||''}')">
           <div class="client-avatar">${initials}</div>
           <div class="client-info">
             <div class="cl-name">${c.nombre}</div>
-            <div class="cl-phone">📱 ${c.telefono||'Sin teléfono'}</div>
+            <div class="cl-phone">📱 ${c.telefono||'Sin teléfono'} ${c.email ? `<span style="display:block;font-size:11px;color:var(--text-muted);margin-top:2px;">✉️ ${c.email}</span>` : ''}</div>
             <div class="cl-visits">${visits} cita${visits!==1?'s':''} ${lastStr?'• '+lastStr:''}</div>
           </div>
           <div class="client-actions" onclick="event.stopPropagation()">
             ${c.telefono ? `<a href="${waUrl}" target="_blank" rel="noopener" class="btn-wa" title="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>` : ''}
-            <div class="btn-new-appt" onclick="createApptForClient('${c.nombre.replace(/'/g,"\\'")}','${c.telefono||''}')" title="Nueva cita">
+            ${c.email ? `<a href="mailto:${c.email}" class="btn-mail" title="Enviar Correo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>` : ''}
+            <div class="btn-new-appt" onclick="createApptForClient('${c.nombre.replace(/'/g,"\\'")}','${c.telefono||''}','${c.email||''}')" title="Nueva cita">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </div>
           </div>
@@ -1702,10 +1762,11 @@
       }).join('');
     }
 
-    function createApptForClient(name, phone) {
+    function createApptForClient(name, phone, email) {
       switchTab('create');
       document.getElementById('inp-name').value = name;
       if (phone) { document.getElementById('inp-phone').value = phone; onPhoneInput(phone); }
+      if (email) { document.getElementById('inp-email').value = email; }
     }
 
     // ═══════════════════════════════════════════
