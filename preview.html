@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario IA - Vista Previa Interactiva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-space: #090A0F;
+      --surface-glass: rgba(22, 27, 38, 0.7);
+      --surface-card: rgba(28, 35, 51, 0.85);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 240, 255, 0.3);
+      --accent-cyan: #00F0FF;
+      --accent-emerald: #00E676;
+      --accent-amber: #FFB300;
+      --accent-rose: #FF3366;
+      --accent-purple: #8A2BE2;
+      --text-main: #FFFFFF;
+      --text-muted: #94A3B8;
+      --text-sub: #64748B;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: radial-gradient(circle at top left, #12182b, #07090e 60%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background lights */
+    .ambient-glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-1 {
+      width: 500px;
+      height: 500px;
+      background: rgba(0, 240, 255, 0.12);
+      top: -100px;
+      left: 10%;
+    }
+    .glow-2 {
+      width: 450px;
+      height: 450px;
+      background: rgba(138, 43, 226, 0.12);
+      bottom: -100px;
+      right: 15%;
+    }
+
+    /* Header controls */
+    .top-bar {
+      z-index: 10;
+      text-align: center;
+      margin-bottom: 24px;
+      max-width: 600px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      color: var(--accent-cyan);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 6px 14px;
+      border-radius: 30px;
+      margin-bottom: 12px;
+    }
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 10px var(--accent-emerald);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .top-bar h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #FFF 30%, #94A3B8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .top-bar p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* Phone Mockup Frame */
+    .phone-container {
+      position: relative;
+      z-index: 10;
+      width: 390px;
+      height: 800px;
+      background: #000;
+      border-radius: 52px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7),
+                  0 0 0 12px #1E232F,
+                  0 0 0 14px rgba(255, 255, 255, 0.08),
+                  0 0 50px rgba(0, 240, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Dynamic Island / Notch */
+    .phone-notch {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 30px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+    }
+    .notch-camera {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #0b1528;
+      border: 1px solid #1a2942;
+    }
+    .notch-sensor {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #09111f;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 26px 8px;
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 90;
+    }
+
+    /* Screens viewport */
+    .screen-viewport {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 10px 18px 90px;
+      scrollbar-width: none;
+    }
+    .screen-viewport::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Screen Views */
+    .view {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .view.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* App Header inside phone */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .app-header h2 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .header-pill {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-glass);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Glass Cards */
+    .glass-card {
+      background: var(--surface-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 24px;
+      padding: 18px;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Appointment Cards in Dashboard */
+    .appt-card {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 12px;
+      border-left: 5px solid transparent;
+    }
+    .appt-card.confirmed {
+      border-left-color: var(--accent-emerald);
+      box-shadow: 0 4px 20px rgba(0, 230, 118, 0.08);
+    }
+    .appt-card.pending {
+      border-left-color: var(--accent-amber);
+      box-shadow: 0 4px 20px rgba(255, 179, 0, 0.08);
+    }
+    .appt-card.canceled {
+      border-left-color: var(--accent-rose);
+      opacity: 0.75;
+    }
+
+    .appt-time {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 58px;
+      padding: 8px 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 14px;
+      border: 1px solid var(--border-glass);
+    }
+    .appt-time .hour {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .appt-time .period {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-sub);
+    }
+
+    .appt-info {
+      flex: 1;
+    }
+    .appt-info h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .appt-info p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .appt-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-confirmed {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--accent-emerald);
+    }
+    .badge-pending {
+      background: rgba(255, 179, 0, 0.15);
+      color: var(--accent-amber);
+    }
+    .badge-canceled {
+      background: rgba(255, 51, 102, 0.15);
+      color: var(--accent-rose);
+    }
+
+    .whatsapp-action-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(37, 211, 102, 0.15);
+      border: 1px solid rgba(37, 211, 102, 0.35);
+      color: #25D366;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .whatsapp-action-btn:hover {
+      background: #25D366;
+      color: #000;
+      transform: scale(1.08);
+      box-shadow: 0 0 15px rgba(37, 211, 102, 0.4);
+    }
+
+    /* Form Fields */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .field-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .custom-input {
+      width: 100%;
+      background: rgba(13, 17, 27, 0.8);
+      border: 1px solid var(--border-glass);
+      padding: 14px 16px 14px 44px;
+      border-radius: 16px;
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.25s;
+    }
+    .custom-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
+    }
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--text-sub);
+      pointer-events: none;
+      display: flex;
+    }
+    .input-suffix {
+      position: absolute;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Quick Action Chips */
+    .chips-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .chip.active, .chip:hover {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    /* Autocomplete Suggestions */
+    .autocomplete-list {
+      position: absolute;
+      top: 105%;
+      left: 0;
+      right: 0;
+      background: #182032;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 16px;
+      z-index: 50;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+      display: none;
+      overflow: hidden;
+    }
+    .autocomplete-item {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .autocomplete-item:hover {
+      background: rgba(0, 240, 255, 0.1);
+    }
+
+    /* WhatsApp validation pill */
+    .wa-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .wa-valid {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+    }
+    .wa-invalid {
+      background: rgba(255, 51, 102, 0.15);
+      color: var(--accent-rose);
+      border: 1px solid rgba(255, 51, 102, 0.3);
+    }
+    .wa-checking {
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+
+    /* Magic Voice Floating Action Button */
+    .magic-voice-container {
+      position: absolute;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 80;
+      pointer-events: none;
+    }
+    .magic-voice-btn {
+      pointer-events: auto;
+      background: linear-gradient(135deg, #00F0FF, #0077FF);
+      color: #000;
+      height: 64px;
+      padding: 0 28px;
+      border-radius: 36px;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0, 240, 255, 0.4),
+                  0 0 0 6px rgba(0, 240, 255, 0.12);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .magic-voice-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(0, 240, 255, 0.6),
+                  0 0 0 8px rgba(0, 240, 255, 0.2);
+    }
+    .magic-voice-btn.listening {
+      background: linear-gradient(135deg, #FF0055, #FF5500);
+      box-shadow: 0 10px 35px rgba(255, 0, 85, 0.5),
+                  0 0 0 10px rgba(255, 0, 85, 0.2);
+      animation: pulse-voice 1.2s infinite;
+      color: #FFF;
+    }
+    @keyframes pulse-voice {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    .magic-voice-btn.save-ready {
+      background: linear-gradient(135deg, #00E676, #00B0FF);
+      box-shadow: 0 10px 35px rgba(0, 230, 118, 0.5);
+      color: #000;
+    }
+
+    .voice-waves {
+      display: none;
+      gap: 4px;
+      align-items: center;
+      height: 20px;
+    }
+    .wave-bar {
+      width: 3px;
+      background: #FFF;
+      border-radius: 3px;
+      animation: sound-wave 0.8s infinite ease-in-out alternate;
+    }
+    .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.1s; }
+    @keyframes sound-wave {
+      from { height: 4px; }
+      to { height: 18px; }
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 78px;
+      background: rgba(13, 17, 27, 0.95);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-top: 1px solid var(--border-glass);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 10px 10px;
+      z-index: 70;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-sub);
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 18px;
+      transition: all 0.2s;
+    }
+    .nav-item.active {
+      color: var(--accent-cyan);
+    }
+    .nav-item.active svg {
+      stroke: var(--accent-cyan);
+    }
+
+    /* Modal for Simulated WhatsApp Chat */
+    .chat-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .chat-modal-overlay.active {
+      display: flex;
+    }
+    .chat-modal {
+      width: 360px;
+      background: #0B141A;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      height: 520px;
+    }
+    .chat-header {
+      background: #1F2C34;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .chat-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chat-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #25D366;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .chat-body {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      background: radial-gradient(circle at center, #101c24, #0b141a);
+    }
+    .chat-msg {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .msg-bot {
+      background: #005C4B;
+      color: #E9EDEF;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .msg-client {
+      background: #1F2C34;
+      color: #E9EDEF;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-ai-badge {
+      font-size: 11px;
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--accent-cyan);
+      padding: 4px 10px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 6px;
+    }
+    .chat-quick-replies {
+      padding: 10px 14px;
+      background: #1F2C34;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .reply-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .reply-pill:hover {
+      background: #25D366;
+      color: #000;
+    }
+
+    /* Toast Notification inside phone */
+    .phone-toast {
+      position: absolute;
+      top: 60px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0, 240, 255, 0.95);
+      color: #000;
+      padding: 12px 18px;
+      border-radius: 18px;
+      font-size: 13px;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 150;
+      box-shadow: 0 10px 30px rgba(0, 240, 255, 0.4);
+      animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Interactive Helper Panel */
+    .controls-panel {
+      z-index: 10;
+      margin-top: 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .action-btn {
+      background: var(--surface-card);
+      border: 1px solid var(--border-glass);
+      color: var(--text-main);
+      padding: 10px 20px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .action-btn:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 240, 255, 0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Lights -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- Header -->
+  <div class="top-bar">
+    <div class="badge">
+      <div class="badge-dot"></div>
+      Prototipo En Vivo
+    </div>
+    <h1>Simulador Interactivo de Agenda IA</h1>
+    <p>Prueba la creación por voz, validación nativa de WhatsApp y panel de control.</p>
+  </div>
+
+  <!-- Phone Mockup Frame -->
+  <div class="phone-container">
+    <!-- Dynamic Island -->
+    <div class="phone-notch">
+      <div class="notch-sensor"></div>
+      <div class="notch-camera"></div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span id="current-time">09:41</span>
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><path d="M1 9.5H2.5M4.5 7.5H6M8 5H9.5M11.5 2H13" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg width="15" height="11" viewBox="0 0 16 12" fill="white"><path d="M8 11.5C8 11.5 12 7.5 12 4C12 1.79086 10.2091 0 8 0C5.79086 0 4 1.79086 4 4C4 7.5 8 11.5 8 11.5Z"/></svg>
+        <div style="width: 22px; height: 11px; border: 1.5px solid white; border-radius: 4px; padding: 1px; display: flex;"><div style="width: 80%; height: 100%; background: #00E676; border-radius: 2px;"></div></div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="phone-toast" class="phone-toast">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      <span id="toast-msg">Mensaje del sistema</span>
+    </div>
+
+    <!-- Main Screens Viewport -->
+    <div class="screen-viewport">
+
+      <!-- VIEW 1: AGENDA DASHBOARD -->
+      <div id="view-dashboard" class="view active">
+        <div class="app-header">
+          <div>
+            <p style="font-size: 12px; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase;">Barbería Élite</p>
+            <h2>Agenda de Hoy</h2>
+          </div>
+          <div class="header-pill">3 Citas</div>
+        </div>
+
+        <!-- Appointment Cards -->
+        <div class="appt-card glass-card confirmed">
+          <div class="appt-time">
+            <span class="hour">10:00</span>
+            <span class="period">AM</span>
+          </div>
+          <div class="appt-info">
+            <h4>Juan Pérez</h4>
+            <p>Corte Clásico & Barba</p>
+            <span class="appt-badge badge-confirmed">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+              Confirmado
+            </span>
+          </div>
+          <div class="whatsapp-action-btn" title="Abrir Chat WhatsApp" onclick="openWhatsAppModal('Juan Pérez', '+52 55 1234 5678', 'confirmado')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          </div>
+        </div>
+
+        <div class="appt-card glass-card pending">
+          <div class="appt-time">
+            <span class="hour">12:30</span>
+            <span class="period">PM</span>
+          </div>
+          <div class="appt-info">
+            <h4>María García</h4>
+            <p>Tinte y Peinado</p>
+            <span class="appt-badge badge-pending">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+              Pendiente (24h)
+            </span>
+          </div>
+          <div class="whatsapp-action-btn" title="Abrir Chat WhatsApp" onclick="openWhatsAppModal('María García', '+52 55 9876 5432', 'pendiente')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          </div>
+        </div>
+
+        <div class="appt-card glass-card canceled">
+          <div class="appt-time">
+            <span class="hour">04:00</span>
+            <span class="period">PM</span>
+          </div>
+          <div class="appt-info">
+            <h4>Carlos López</h4>
+            <p>Limpieza Facial</p>
+            <span class="appt-badge badge-canceled">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+              Cancelado (Libre)
+            </span>
+          </div>
+          <div class="whatsapp-action-btn" title="Abrir Chat WhatsApp" onclick="openWhatsAppModal('Carlos López', '+52 55 4444 3333', 'cancelado')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 2: NUEVA CITA ULTRA-RÁPIDA -->
+      <div id="view-create" class="view">
+        <div class="app-header">
+          <div>
+            <p style="font-size: 12px; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase;">Modo Ultra-Rápido</p>
+            <h2>Nueva Cita</h2>
+          </div>
+          <div class="header-pill">&lt; 5 Segundos</div>
+        </div>
+
+        <div class="glass-card">
+          <!-- Campo 1: Nombre del Cliente -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Nombre del Cliente</span>
+              <span style="color: var(--accent-cyan); font-size: 10px;">Agenda Nativa</span>
+            </div>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </span>
+              <input type="text" id="input-name" class="custom-input" placeholder="Escribe para buscar..." oninput="searchContacts(this.value)">
+              <div id="autocomplete-box" class="autocomplete-list"></div>
+            </div>
+          </div>
+
+          <!-- Campo 2: Servicio -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Servicio</span>
+            </div>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
+              </span>
+              <input type="text" id="input-service" class="custom-input" placeholder="Corte, tinte, limpieza...">
+            </div>
+            <div class="chips-row" style="margin-top: 6px;">
+              <span class="chip" onclick="selectChip('Corte Clásico')">✂️ Corte Clásico</span>
+              <span class="chip" onclick="selectChip('Limpieza Dental')">🦷 Limpieza</span>
+              <span class="chip" onclick="selectChip('Tinte de Barba')">🧔 Barba</span>
+            </div>
+          </div>
+
+          <!-- Campo 3: Teléfono con Validación WhatsApp -->
+          <div class="field-group">
+            <div class="field-label">
+              <span>Teléfono</span>
+              <span id="wa-indicator" class="wa-status-pill wa-checking" style="display: none;">Verificando...</span>
+            </div>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              </span>
+              <input type="tel" id="input-phone" class="custom-input" placeholder="Ej. 5551234567" oninput="handlePhoneInput(this.value)">
+              <div class="input-suffix">
+                <button type="button" title="Guardar en agenda nativa" onclick="saveToNativeContacts()" style="background: none; border: none; color: var(--accent-cyan); cursor: pointer; display: flex;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Campo 4: Fecha y Hora -->
+          <div class="field-group">
+            <div class="field-label">Fecha y Hora</div>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              </span>
+              <input type="datetime-local" id="input-datetime" class="custom-input">
+            </div>
+          </div>
+        </div>
+
+        <div style="height: 60px;"></div>
+      </div>
+
+    </div>
+
+    <!-- Floating Magic Voice Button (Only visible or prominent in Create mode) -->
+    <div class="magic-voice-container">
+      <button id="magic-voice-btn" class="magic-voice-btn" onclick="triggerMagicVoice()">
+        <svg id="mic-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        <div id="voice-waves" class="voice-waves">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        <span id="voice-btn-text">Dictar Cita con IA</span>
+      </button>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+      <div id="nav-dashboard" class="nav-item active" onclick="switchTab('dashboard')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <span>Agenda</span>
+      </div>
+      <div id="nav-create" class="nav-item" onclick="switchTab('create')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+        <span>Nueva Cita</span>
+      </div>
+      <div class="nav-item" onclick="openWhatsAppModal('Demostración', '+52 55 9999 8888', 'pendiente')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+        <span>WhatsApp IA</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WhatsApp Interactive Simulation Modal -->
+  <div id="chat-modal" class="chat-modal-overlay">
+    <div class="chat-modal">
+      <div class="chat-header">
+        <div class="chat-user">
+          <div class="chat-avatar" id="modal-client-avatar">J</div>
+          <div>
+            <h4 id="modal-client-name" style="font-size: 14px; font-weight: 700;">Cliente</h4>
+            <p id="modal-client-phone" style="font-size: 11px; color: #25D366;">WhatsApp Verificado</p>
+          </div>
+        </div>
+        <button onclick="closeWhatsAppModal()" style="background: none; border: none; color: #FFF; font-size: 18px; cursor: pointer;">✕</button>
+      </div>
+      <div id="chat-messages" class="chat-body">
+        <div class="chat-msg msg-bot">
+          Hola Juan, te recordamos tu cita para *Corte Clásico* mañana a las 10:00 AM en Barbería Élite.<br><br>¿Confirmas tu asistencia?
+        </div>
+      </div>
+      <div class="chat-quick-replies">
+        <span class="reply-pill" onclick="simulateClientReply('¡Sí, confirmado! Ahí estaré puntual.')">✅ Confirmar</span>
+        <span class="reply-pill" onclick="simulateClientReply('Lo siento, se me complicó, cancelo.')">❌ Cancelar</span>
+        <span class="reply-pill" onclick="simulateClientReply('¿Podríamos moverla para el viernes a las 5pm?')">🔄 Reprogramar</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- External interactive controls -->
+  <div class="controls-panel">
+    <button class="action-btn" onclick="testVoiceFlow()">
+      <span>🎙️</span> Probar Entrada por Voz (Simular: "Corte para Juan mañana 4pm")
+    </button>
+    <button class="action-btn" onclick="openWhatsAppModal('María García', '+52 55 9876 5432', 'pendiente')">
+      <span>💬</span> Probar Webhook WhatsApp + GPT-4o-mini
+    </button>
+  </div>
+
+  <script>
+    // Mock Native Contacts DB
+    const contactsDB = [
+      { name: "Juan Pérez", phone: "5551234567" },
+      { name: "María García", phone: "5559876543" },
+      { name: "Carlos López", phone: "5554443333" },
+      { name: "Alejandro Torres", phone: "5558889999" },
+      { name: "Lucía Méndez", phone: "5557771111" }
+    ];
+
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('current-time').innerText = `${hours}:${mins}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Default datetime
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(16, 0, 0, 0);
+    const tzOffset = tomorrow.getTimezoneOffset() * 60000;
+    const localISOTime = (new Date(tomorrow - tzOffset)).toISOString().slice(0, 16);
+    document.getElementById('input-datetime').value = localISOTime;
+
+    // Tab Switching
+    function switchTab(tab) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+      if (tab === 'dashboard') {
+        document.getElementById('view-dashboard').classList.add('active');
+        document.getElementById('nav-dashboard').classList.add('active');
+        document.getElementById('magic-voice-btn').style.display = 'none';
+      } else {
+        document.getElementById('view-create').classList.add('active');
+        document.getElementById('nav-create').classList.add('active');
+        document.getElementById('magic-voice-btn').style.display = 'flex';
+      }
+    }
+    // Start with create view visible or switch as needed
+    switchTab('dashboard');
+
+    // Show Toast
+    function showToast(msg, isSuccess = true) {
+      const toast = document.getElementById('phone-toast');
+      document.getElementById('toast-msg').innerText = msg;
+      toast.style.background = isSuccess ? 'rgba(0, 240, 255, 0.95)' : 'rgba(255, 51, 102, 0.95)';
+      toast.style.display = 'flex';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+
+    // Contact Search Autocomplete
+    function searchContacts(query) {
+      const box = document.getElementById('autocomplete-box');
+      if (query.length < 2) {
+        box.style.display = 'none';
+        return;
+      }
+      const matches = contactsDB.filter(c => c.name.toLowerCase().includes(query.toLowerCase()));
+      if (matches.length === 0) {
+        box.style.display = 'none';
+        return;
+      }
+
+      box.innerHTML = matches.map(c => `
+        <div class="autocomplete-item" onclick="selectContact('${c.name}', '${c.phone}')">
+          <div>
+            <strong>${c.name}</strong>
+            <div style="font-size: 11px; color: #94A3B8;">📱 ${c.phone}</div>
+          </div>
+          <span style="color: #00F0FF; font-size: 11px;">Elegir</span>
+        </div>
+      `).join('');
+      box.style.display = 'block';
+    }
+
+    function selectContact(name, phone) {
+      document.getElementById('input-name').value = name;
+      document.getElementById('input-phone').value = phone;
+      document.getElementById('autocomplete-box').style.display = 'none';
+      handlePhoneInput(phone);
+    }
+
+    function selectChip(service) {
+      document.getElementById('input-service').value = service;
+    }
+
+    // Phone Validation simulation
+    let debounceTimer;
+    function handlePhoneInput(phone) {
+      clearTimeout(debounceTimer);
+      const indicator = document.getElementById('wa-indicator');
+      const clean = phone.replace(/\D/g, '');
+
+      if (clean.length < 6) {
+        indicator.style.display = 'none';
+        return;
+      }
+
+      indicator.style.display = 'inline-flex';
+      indicator.className = 'wa-status-pill wa-checking';
+      indicator.innerText = 'Verificando...';
+
+      debounceTimer = setTimeout(() => {
+        // Validation rule: numbers ending in 0 are simulated as without WhatsApp
+        if (clean.endsWith('0')) {
+          indicator.className = 'wa-status-pill wa-invalid';
+          indicator.innerText = '❌ Sin WhatsApp';
+          showToast('El teléfono no tiene cuenta de WhatsApp activa', false);
+        } else {
+          indicator.className = 'wa-status-pill wa-valid';
+          indicator.innerText = '✅ WhatsApp Activo';
+        }
+      }, 700);
+    }
+
+    function saveToNativeContacts() {
+      const name = document.getElementById('input-name').value;
+      const phone = document.getElementById('input-phone').value;
+      if (!name || !phone) {
+        showToast('Completa el nombre y teléfono primero', false);
+        return;
+      }
+      contactsDB.push({ name, phone });
+      showToast(`Contacto "${name}" guardado en tu agenda 📱`);
+    }
+
+    // Magic Voice Flow
+    let voiceState = 'idle'; // idle -> listening -> ready
+    function triggerMagicVoice() {
+      const btn = document.getElementById('magic-voice-btn');
+      const btnText = document.getElementById('voice-btn-text');
+      const micIcon = document.getElementById('mic-icon');
+      const waves = document.getElementById('voice-waves');
+
+      if (voiceState === 'ready') {
+        // Save
+        showToast('¡Cita guardada y agendada con éxito! ✨');
+        btn.className = 'magic-voice-btn';
+        btnText.innerText = 'Dictar Cita con IA';
+        micIcon.style.display = 'block';
+        waves.style.display = 'none';
+        voiceState = 'idle';
+        setTimeout(() => switchTab('dashboard'), 1200);
+        return;
+      }
+
+      if (voiceState === 'idle') {
+        // Start listening
+        voiceState = 'listening';
+        btn.classList.add('listening');
+        btnText.innerText = 'Escuchando... ("Corte para Juan...")';
+        micIcon.style.display = 'none';
+        waves.style.display = 'flex';
+
+        setTimeout(() => {
+          // AI Finished Parsing
+          document.getElementById('input-name').value = 'Juan Pérez';
+          document.getElementById('input-service').value = 'Corte Clásico';
+          document.getElementById('input-phone').value = '5551234567';
+          handlePhoneInput('5551234567');
+
+          btn.className = 'magic-voice-btn save-ready';
+          btnText.innerText = 'Confirmar y Guardar';
+          micIcon.style.display = 'block';
+          micIcon.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
+          waves.style.display = 'none';
+          voiceState = 'ready';
+          showToast('IA completó el formulario en 2.4s ✨');
+        }, 2200);
+      }
+    }
+
+    function testVoiceFlow() {
+      switchTab('create');
+      triggerMagicVoice();
+    }
+
+    // Simulated WhatsApp Chat Modal
+    function openWhatsAppModal(name, phone, status) {
+      document.getElementById('modal-client-name').innerText = name;
+      document.getElementById('modal-client-phone').innerText = phone;
+      document.getElementById('modal-client-avatar').innerText = name.charAt(0);
+      document.getElementById('chat-modal').classList.add('active');
+    }
+
+    function closeWhatsAppModal() {
+      document.getElementById('chat-modal').classList.remove('active');
+    }
+
+    function simulateClientReply(replyText) {
+      const container = document.getElementById('chat-messages');
+      // Add client message
+      const clientMsg = document.createElement('div');
+      clientMsg.className = 'chat-msg msg-client';
+      clientMsg.innerText = replyText;
+      container.appendChild(clientMsg);
+      container.scrollTop = container.scrollHeight;
+
+      // Simulate GPT-4o-mini Edge Function parsing
+      setTimeout(() => {
+        let intent = 'CONFIRMADO';
+        let badgeText = 'IA Clasificó: CONFIRMADO (Estado cambiado a Verde)';
+        let statusColor = '#00E676';
+
+        if (replyText.includes('cancelo') || replyText.includes('cancelar')) {
+          intent = 'CANCELADO';
+          badgeText = 'IA Clasificó: CANCELADO (Espacio liberado en agenda)';
+          statusColor = '#FF3366';
+        } else if (replyText.includes('moverla') || replyText.includes('reprogramar')) {
+          intent = 'REPROGRAMACION';
+          badgeText = 'IA Clasificó: REPROGRAMACIÓN (Viernes 5:00 PM detectado)';
+          statusColor = '#FFB300';
+        }
+
+        const aiBadge = document.createElement('div');
+        aiBadge.className = 'chat-ai-badge';
+        aiBadge.style.color = statusColor;
+        aiBadge.innerHTML = `🤖 <strong>GPT-4o-mini:</strong> ${badgeText}`;
+        container.appendChild(aiBadge);
+        container.scrollTop = container.scrollHeight;
+
+        showToast(`Webhook procesado: Cita actualizada a ${intent}`);
+      }, 900);
+    }
+  </script>
+</body>
+</html>
