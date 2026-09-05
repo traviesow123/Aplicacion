@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg-primary: #0C0A09;
@@ -90,13 +91,167 @@
       66% { transform: translate(-15px, 20px) scale(0.97); }
     }
 
+    /* ═══ AUTH SCREEN ═══ */
+    .auth-screen {
+      position: fixed; inset: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      opacity: 1; transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .auth-screen.hidden {
+      opacity: 0; pointer-events: none; transform: scale(0.95);
+    }
+    .auth-container {
+      width: 100%; max-width: 400px;
+      animation: authSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes authSlideIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .auth-logo {
+      text-align: center; margin-bottom: 32px;
+    }
+    .auth-logo-icon {
+      width: 72px; height: 72px; margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--accent-primary), #C88B2E);
+      border-radius: 20px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 32px rgba(212, 168, 83, 0.3);
+      animation: logoPulse 3s ease-in-out infinite;
+    }
+    @keyframes logoPulse {
+      0%, 100% { box-shadow: 0 8px 32px rgba(212, 168, 83, 0.3); }
+      50% { box-shadow: 0 8px 48px rgba(212, 168, 83, 0.5); }
+    }
+    .auth-logo h1 {
+      font-size: 28px; font-weight: 900; letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent-primary));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .auth-logo p {
+      font-size: 14px; color: var(--text-muted); margin-top: 6px; font-weight: 500;
+    }
+    .auth-card {
+      background: var(--surface-card); backdrop-filter: blur(24px);
+      border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);
+      padding: 28px 24px; box-shadow: var(--shadow-card);
+    }
+    .auth-tabs {
+      display: flex; gap: 4px; margin-bottom: 24px;
+      background: rgba(12, 10, 9, 0.6); border-radius: var(--radius-sm);
+      padding: 4px;
+    }
+    .auth-tab {
+      flex: 1; padding: 10px; border: none; border-radius: 8px;
+      background: transparent; color: var(--text-muted);
+      font-size: 14px; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: all var(--transition-fast);
+    }
+    .auth-tab.active {
+      background: rgba(212, 168, 83, 0.15); color: var(--accent-primary);
+      box-shadow: 0 2px 8px rgba(212, 168, 83, 0.1);
+    }
+    .auth-tab:hover:not(.active) { color: var(--text-secondary); }
+    .auth-form { display: none; flex-direction: column; gap: 16px; }
+    .auth-form.active { display: flex; }
+    .auth-input-group { position: relative; }
+    .auth-input-group .auth-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); display: flex; pointer-events: none;
+      transition: color var(--transition-fast);
+    }
+    .auth-input {
+      width: 100%; background: rgba(12, 10, 9, 0.85);
+      border: 1px solid var(--border-subtle);
+      padding: 14px 16px 14px 44px; border-radius: var(--radius-md);
+      color: var(--text-primary); font-size: 14px; font-weight: 500;
+      font-family: inherit; outline: none; transition: all var(--transition-fast);
+    }
+    .auth-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .auth-input:focus + .auth-icon, .auth-input:focus ~ .auth-icon { color: var(--accent-primary); }
+    .auth-input::placeholder { color: var(--text-muted); }
+    .auth-btn {
+      width: 100%; padding: 16px; border-radius: var(--radius-md); border: none;
+      background: linear-gradient(135deg, var(--accent-primary), #C88B2E);
+      color: #0C0A09; font-size: 15px; font-weight: 800; font-family: inherit;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all var(--transition-smooth);
+      box-shadow: 0 4px 20px rgba(212, 168, 83, 0.3);
+    }
+    .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212, 168, 83, 0.5); }
+    .auth-btn:active { transform: translateY(0); }
+    .auth-btn:disabled {
+      opacity: 0.6; cursor: not-allowed; transform: none !important;
+      box-shadow: none !important;
+    }
+    .auth-btn .spinner {
+      width: 18px; height: 18px; border: 2.5px solid rgba(12,10,9,0.3);
+      border-top-color: #0C0A09; border-radius: 50%;
+      animation: spin 0.6s linear infinite; display: none;
+    }
+    .auth-btn.loading .spinner { display: block; }
+    .auth-btn.loading .btn-text { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .auth-error {
+      background: rgba(244, 114, 182, 0.1); border: 1px solid rgba(244, 114, 182, 0.25);
+      border-radius: var(--radius-sm); padding: 10px 14px;
+      font-size: 13px; color: var(--accent-rose); font-weight: 600;
+      display: none; align-items: center; gap: 8px;
+      animation: shakeError 0.4s ease;
+    }
+    .auth-error.visible { display: flex; }
+    @keyframes shakeError {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    .auth-success {
+      background: rgba(78, 205, 196, 0.1); border: 1px solid rgba(78, 205, 196, 0.25);
+      border-radius: var(--radius-sm); padding: 10px 14px;
+      font-size: 13px; color: var(--accent-teal); font-weight: 600;
+      display: none; align-items: center; gap: 8px;
+    }
+    .auth-success.visible { display: flex; }
+    .auth-divider {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 12px; color: var(--text-muted); font-weight: 600;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border-subtle);
+    }
+
+    /* ═══ LOADING OVERLAY ═══ */
+    .loading-overlay {
+      position: fixed; inset: 0; z-index: 600;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+      background: var(--bg-primary);
+      transition: opacity 0.4s ease;
+    }
+    .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+    .loading-spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border-subtle);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    .loading-text { font-size: 14px; color: var(--text-muted); font-weight: 600; }
+
     /* ═══ APP SHELL ═══ */
     .app-shell {
       position: relative; z-index: 1;
       max-width: 480px; margin: 0 auto;
       min-height: 100vh; min-height: 100dvh;
       display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
     }
+    .app-shell.visible { opacity: 1; pointer-events: auto; }
 
     /* ═══ HEADER ═══ */
     .app-top-header {
@@ -131,6 +286,16 @@
     @keyframes pulseDot {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(0.7); }
+    }
+    .btn-logout {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(244, 114, 182, 0.08); border: 1px solid rgba(244, 114, 182, 0.2);
+      color: var(--accent-rose); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all var(--transition-fast);
+    }
+    .btn-logout:hover {
+      background: rgba(244, 114, 182, 0.2); transform: scale(1.08);
+      box-shadow: 0 0 16px rgba(244, 114, 182, 0.2);
     }
 
     /* ═══ CONTENT AREA ═══ */
@@ -354,7 +519,9 @@
       border-top: 1px solid var(--border-subtle);
       display: flex; justify-content: space-around; align-items: center;
       padding: 0 4px; z-index: 100;
+      opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
     }
+    .bottom-nav.visible { opacity: 1; pointer-events: auto; }
     .nav-btn {
       display: flex; flex-direction: column; align-items: center; gap: 3px;
       color: var(--text-muted); font-size: 10px; font-weight: 600;
@@ -529,6 +696,31 @@
     }
     .reminder-banner .rb-item a:hover { transform: scale(1.05); }
 
+    /* ═══ USER INFO BAR ═══ */
+    .user-info-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 20px; background: rgba(212,168,83,0.04);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 12px; color: var(--text-muted);
+    }
+    .user-info-bar .user-email {
+      flex: 1; font-weight: 600; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap;
+    }
+    .user-info-bar .user-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent-teal);
+    }
+
+    /* ═══ MIGRATION BANNER ═══ */
+    .migration-banner {
+      background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.2);
+      border-radius: var(--radius-md); padding: 14px 16px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--accent-teal); font-weight: 600;
+      animation: viewFadeIn 0.3s ease;
+    }
+
     @media (max-width: 480px) {
       .app-shell { max-width: 100%; }
       .bottom-nav { max-width: 100%; }
@@ -544,7 +736,95 @@
 
   <div id="toast-container" class="toast-container"></div>
 
-  <div class="app-shell">
+  <!-- LOADING OVERLAY -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Cargando Agenda IA...</div>
+  </div>
+
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen" class="auth-screen hidden">
+    <div class="auth-container">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0C0A09" stroke-width="2.5">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <h1>Agenda IA</h1>
+        <p>Tu asistente de citas inteligente</p>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Iniciar Sesión</button>
+          <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Crear Cuenta</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="form-login" class="auth-form active" onsubmit="handleLogin(event)">
+          <div id="login-error" class="auth-error">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span id="login-error-msg"></span>
+          </div>
+          <div class="auth-input-group">
+            <input type="email" id="login-email" class="auth-input" placeholder="Correo electrónico" required autocomplete="email">
+            <span class="auth-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </span>
+          </div>
+          <div class="auth-input-group">
+            <input type="password" id="login-password" class="auth-input" placeholder="Contraseña" required minlength="6" autocomplete="current-password">
+            <span class="auth-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+          </div>
+          <button type="submit" class="auth-btn" id="btn-login">
+            <div class="spinner"></div>
+            <span class="btn-text">Iniciar Sesión</span>
+          </button>
+        </form>
+
+        <!-- SIGNUP FORM -->
+        <form id="form-signup" class="auth-form" onsubmit="handleSignup(event)">
+          <div id="signup-error" class="auth-error">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span id="signup-error-msg"></span>
+          </div>
+          <div id="signup-success" class="auth-success">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="signup-success-msg"></span>
+          </div>
+          <div class="auth-input-group">
+            <input type="email" id="signup-email" class="auth-input" placeholder="Correo electrónico" required autocomplete="email">
+            <span class="auth-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </span>
+          </div>
+          <div class="auth-input-group">
+            <input type="password" id="signup-password" class="auth-input" placeholder="Contraseña (mín. 6 caracteres)" required minlength="6" autocomplete="new-password">
+            <span class="auth-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+          </div>
+          <div class="auth-input-group">
+            <input type="password" id="signup-password-confirm" class="auth-input" placeholder="Confirmar contraseña" required minlength="6" autocomplete="new-password">
+            <span class="auth-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+          </div>
+          <button type="submit" class="auth-btn" id="btn-signup">
+            <div class="spinner"></div>
+            <span class="btn-text">Crear Cuenta</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP SHELL -->
+  <div class="app-shell" id="app-shell">
     <header class="app-top-header">
       <div class="header-left">
         <span class="header-greeting" id="header-greeting">Buenas noches</span>
@@ -555,12 +835,25 @@
           <div class="live-dot"></div>
           <span id="badge-count">0 citas</span>
         </div>
+        <button class="btn-logout" id="btn-logout" onclick="handleLogout()" title="Cerrar sesión">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
       </div>
     </header>
+
+    <div class="user-info-bar" id="user-info-bar">
+      <div class="user-dot"></div>
+      <span class="user-email" id="user-email-display">usuario@email.com</span>
+    </div>
 
     <div class="content-area">
       <!-- DASHBOARD -->
       <div id="view-dashboard" class="view active">
+        <div id="migration-banner-container"></div>
         <div id="reminder-banner-container"></div>
         <div class="stats-row">
           <div class="stat-card">
@@ -696,7 +989,7 @@
             Datos
           </div>
           <div class="config-card">
-            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Los datos se guardan localmente en tu navegador.</p>
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Los datos se guardan de forma segura en la nube, asociados a tu cuenta.</p>
             <button class="btn-submit" style="background:linear-gradient(135deg,var(--accent-rose),#D94E6E);color:#fff;box-shadow:0 4px 20px rgba(244,114,182,0.3);" onclick="if(confirm('¿Seguro que deseas borrar TODAS las citas? Esta acción no se puede deshacer.')) { clearAllData(); }">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               Borrar Todas las Citas
@@ -706,7 +999,7 @@
       </div>
     </div>
 
-    <nav class="bottom-nav">
+    <nav class="bottom-nav" id="bottom-nav">
       <button class="nav-btn active" id="nav-agenda" onclick="switchTab('dashboard')">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         <span>Agenda</span>
@@ -727,30 +1020,382 @@
   </div>
 
   <script>
-    const STORAGE_KEYS = {
-      appointments: 'agendaia_appointments',
-      clients: 'agendaia_clients',
-      services: 'agendaia_services',
-      reminderEnabled: 'agendaia_reminder_enabled',
-      reminderTemplate: 'agendaia_reminder_template',
-      remindedIds: 'agendaia_reminded_ids'
-    };
+    // ═══════════════════════════════════════════
+    // SUPABASE INIT
+    // ═══════════════════════════════════════════
+    const SUPABASE_URL = 'https://tyzdjkazimkzthvfaglt.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_dyp1_RiEW2w1pvB6YgDPmQ_CK5wYJVz';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let cachedAppointments = [];
+    let cachedClients = [];
+    let cachedServices = [];
+    let cachedSettings = null;
 
     const DEFAULT_REMINDER_MSG = 'Hola {nombre}, te recordamos tu cita para *{servicio}* mañana a las {hora}. ¿Confirmás tu asistencia?';
 
-    function getData(key) { try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : null; } catch { return null; } }
-    function setData(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
-    function getAppointments() { return getData(STORAGE_KEYS.appointments) || []; }
-    function saveAppointments(a) { setData(STORAGE_KEYS.appointments, a); }
-    function getClients() { return getData(STORAGE_KEYS.clients) || []; }
-    function saveClients(c) { setData(STORAGE_KEYS.clients, c); }
-    function getServices() { return getData(STORAGE_KEYS.services) || []; }
-    function saveServices(s) { setData(STORAGE_KEYS.services, s); }
-    function isReminderEnabled() { return getData(STORAGE_KEYS.reminderEnabled) === true; }
-    function getReminderTemplate() { return getData(STORAGE_KEYS.reminderTemplate) || DEFAULT_REMINDER_MSG; }
-    function getRemindedIds() { return getData(STORAGE_KEYS.remindedIds) || []; }
+    // ═══════════════════════════════════════════
+    // AUTH FUNCTIONS
+    // ═══════════════════════════════════════════
+    function switchAuthTab(tab) {
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+      document.getElementById('form-login').classList.toggle('active', tab === 'login');
+      document.getElementById('form-signup').classList.toggle('active', tab === 'signup');
+      // Clear errors
+      document.getElementById('login-error').classList.remove('visible');
+      document.getElementById('signup-error').classList.remove('visible');
+      document.getElementById('signup-success').classList.remove('visible');
+    }
 
-    // ═══ TOAST ═══
+    function showAuthError(formType, msg) {
+      const el = document.getElementById(`${formType}-error`);
+      document.getElementById(`${formType}-error-msg`).textContent = msg;
+      el.classList.add('visible');
+    }
+
+    function setAuthLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      if (loading) { btn.classList.add('loading'); btn.disabled = true; }
+      else { btn.classList.remove('loading'); btn.disabled = false; }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      document.getElementById('login-error').classList.remove('visible');
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      setAuthLoading('btn-login', true);
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      setAuthLoading('btn-login', false);
+
+      if (error) {
+        const msgs = {
+          'Invalid login credentials': 'Correo o contraseña incorrectos',
+          'Email not confirmed': 'Revisá tu correo para confirmar tu cuenta',
+        };
+        showAuthError('login', msgs[error.message] || error.message);
+        return;
+      }
+      // Session is automatically stored by Supabase — login successful
+    }
+
+    async function handleSignup(e) {
+      e.preventDefault();
+      document.getElementById('signup-error').classList.remove('visible');
+      document.getElementById('signup-success').classList.remove('visible');
+
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-password-confirm').value;
+
+      if (password !== confirm) {
+        showAuthError('signup', 'Las contraseñas no coinciden');
+        return;
+      }
+
+      setAuthLoading('btn-signup', true);
+      const { data, error } = await sb.auth.signUp({ email, password });
+      setAuthLoading('btn-signup', false);
+
+      if (error) {
+        const msgs = {
+          'User already registered': 'Ya existe una cuenta con ese correo',
+          'Password should be at least 6 characters': 'La contraseña debe tener al menos 6 caracteres',
+        };
+        showAuthError('signup', msgs[error.message] || error.message);
+        return;
+      }
+
+      // Check if email confirmation is required
+      if (data.user && !data.session) {
+        const successEl = document.getElementById('signup-success');
+        document.getElementById('signup-success-msg').textContent = '¡Cuenta creada! Revisá tu correo para confirmar.';
+        successEl.classList.add('visible');
+      }
+      // If session is returned immediately, auth listener will handle it
+    }
+
+    async function handleLogout() {
+      if (!confirm('¿Seguro que deseas cerrar sesión?')) return;
+      await sb.auth.signOut();
+      // Auth state change listener will handle UI
+    }
+
+    // ═══════════════════════════════════════════
+    // AUTH STATE MANAGEMENT
+    // ═══════════════════════════════════════════
+    let isAppInitialized = false;
+
+    function showApp(user) {
+      currentUser = user;
+      document.getElementById('loading-overlay').classList.add('hidden');
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('app-shell').classList.add('visible');
+      document.getElementById('bottom-nav').classList.add('visible');
+      document.getElementById('user-email-display').textContent = user.email;
+      if (!isAppInitialized) {
+        isAppInitialized = true;
+        initApp();
+      }
+    }
+
+    function showAuth() {
+      currentUser = null;
+      isAppInitialized = false;
+      cachedAppointments = [];
+      cachedClients = [];
+      cachedServices = [];
+      cachedSettings = null;
+      document.getElementById('loading-overlay').classList.add('hidden');
+      document.getElementById('auth-screen').classList.remove('hidden');
+      document.getElementById('app-shell').classList.remove('visible');
+      document.getElementById('bottom-nav').classList.remove('visible');
+    }
+
+    // Listen for auth state changes
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        showApp(session.user);
+      } else if (event === 'SIGNED_OUT') {
+        showAuth();
+      }
+    });
+
+    // Initial session check
+    (async function checkSession() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        showApp(session.user);
+      } else {
+        showAuth();
+      }
+    })();
+
+    // ═══════════════════════════════════════════
+    // DATA MIGRATION (localStorage → Supabase)
+    // ═══════════════════════════════════════════
+    async function migrateLocalData() {
+      if (localStorage.getItem('agendaia_migrated')) return false;
+
+      const localAppts = (() => { try { return JSON.parse(localStorage.getItem('agendaia_appointments')) || []; } catch { return []; } })();
+      const localClients = (() => { try { return JSON.parse(localStorage.getItem('agendaia_clients')) || []; } catch { return []; } })();
+      const localServices = (() => { try { return JSON.parse(localStorage.getItem('agendaia_services')) || []; } catch { return []; } })();
+
+      if (localAppts.length === 0 && localClients.length === 0 && localServices.length === 0) {
+        localStorage.setItem('agendaia_migrated', 'true');
+        return false;
+      }
+
+      let migrated = 0;
+      const uid = currentUser.id;
+
+      // Migrate clients
+      if (localClients.length > 0) {
+        const clientRows = localClients.map(c => ({
+          user_id: uid,
+          nombre: c.nombre,
+          telefono: c.telefono || null,
+        }));
+        const { error } = await sb.from('user_clients').upsert(clientRows, { onConflict: 'user_id,nombre', ignoreDuplicates: true });
+        if (!error) migrated += clientRows.length;
+      }
+
+      // Migrate services
+      if (localServices.length > 0) {
+        const svcRows = localServices.map(s => ({
+          user_id: uid,
+          name: s.name,
+          emoji: s.emoji || '⭐',
+        }));
+        const { error } = await sb.from('user_services').upsert(svcRows, { onConflict: 'user_id,name', ignoreDuplicates: true });
+        if (!error) migrated += svcRows.length;
+      }
+
+      // Migrate appointments
+      if (localAppts.length > 0) {
+        const apptRows = localAppts.map(a => ({
+          user_id: uid,
+          nombre: a.nombre,
+          servicio: a.servicio,
+          telefono: a.telefono || null,
+          fecha_hora: a.fecha_hora,
+          estado: a.estado || 'pendiente',
+          created_at: a.created_at || new Date().toISOString(),
+          updated_at: a.updated_at || new Date().toISOString(),
+        }));
+        const { error } = await sb.from('user_appointments').insert(apptRows);
+        if (!error) migrated += apptRows.length;
+      }
+
+      // Migrate settings
+      const reminderEnabled = (() => { try { return JSON.parse(localStorage.getItem('agendaia_reminder_enabled')); } catch { return false; } })();
+      const reminderTemplate = localStorage.getItem('agendaia_reminder_template');
+      if (reminderEnabled || reminderTemplate) {
+        await sb.from('user_settings').upsert({
+          user_id: uid,
+          reminder_enabled: reminderEnabled === true,
+          reminder_template: reminderTemplate || DEFAULT_REMINDER_MSG,
+        });
+      }
+
+      localStorage.setItem('agendaia_migrated', 'true');
+      return migrated > 0;
+    }
+
+    // ═══════════════════════════════════════════
+    // SUPABASE DATA FUNCTIONS
+    // ═══════════════════════════════════════════
+
+    // --- Appointments ---
+    async function fetchAppointments() {
+      const { data, error } = await sb.from('user_appointments')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('fecha_hora', { ascending: true });
+      if (error) { console.error('fetchAppointments:', error); return []; }
+      cachedAppointments = data || [];
+      return cachedAppointments;
+    }
+
+    async function insertAppointment(appt) {
+      const { data, error } = await sb.from('user_appointments').insert({
+        user_id: currentUser.id,
+        nombre: appt.nombre,
+        servicio: appt.servicio,
+        telefono: appt.telefono || null,
+        fecha_hora: appt.fecha_hora,
+        estado: 'pendiente',
+      }).select().single();
+      if (error) { console.error('insertAppointment:', error); return null; }
+      cachedAppointments.push(data);
+      return data;
+    }
+
+    async function updateAppointmentStatus(id, estado) {
+      const { error } = await sb.from('user_appointments')
+        .update({ estado, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('user_id', currentUser.id);
+      if (error) { console.error('updateStatus:', error); return false; }
+      const idx = cachedAppointments.findIndex(a => a.id === id);
+      if (idx >= 0) cachedAppointments[idx].estado = estado;
+      return true;
+    }
+
+    async function deleteAllAppointments() {
+      const { error } = await sb.from('user_appointments')
+        .delete()
+        .eq('user_id', currentUser.id);
+      if (error) { console.error('deleteAll:', error); return false; }
+      cachedAppointments = [];
+      return true;
+    }
+
+    // --- Clients ---
+    async function fetchClients() {
+      const { data, error } = await sb.from('user_clients')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('nombre', { ascending: true });
+      if (error) { console.error('fetchClients:', error); return []; }
+      cachedClients = data || [];
+      return cachedClients;
+    }
+
+    async function upsertClient(nombre, telefono) {
+      // Check if already exists by name
+      const existing = cachedClients.find(c => c.nombre.toLowerCase() === nombre.toLowerCase());
+      if (existing) {
+        if (telefono && existing.telefono !== telefono) {
+          await sb.from('user_clients')
+            .update({ telefono })
+            .eq('id', existing.id);
+          existing.telefono = telefono;
+        }
+        return existing;
+      }
+      const { data, error } = await sb.from('user_clients').insert({
+        user_id: currentUser.id,
+        nombre,
+        telefono: telefono || null,
+      }).select().single();
+      if (error) {
+        // Might be duplicate, try to fetch
+        if (error.code === '23505') {
+          const { data: fetched } = await sb.from('user_clients')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .ilike('nombre', nombre)
+            .single();
+          if (fetched) { cachedClients.push(fetched); return fetched; }
+        }
+        console.error('upsertClient:', error);
+        return null;
+      }
+      cachedClients.push(data);
+      return data;
+    }
+
+    // --- Services ---
+    async function fetchServices() {
+      const { data, error } = await sb.from('user_services')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: true });
+      if (error) { console.error('fetchServices:', error); return []; }
+      cachedServices = data || [];
+      return cachedServices;
+    }
+
+    async function insertService(name, emoji = '⭐') {
+      if (cachedServices.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+        return null; // duplicate
+      }
+      const { data, error } = await sb.from('user_services').insert({
+        user_id: currentUser.id,
+        name,
+        emoji,
+      }).select().single();
+      if (error) { console.error('insertService:', error); return null; }
+      cachedServices.push(data);
+      return data;
+    }
+
+    async function removeService(id) {
+      const { error } = await sb.from('user_services')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', currentUser.id);
+      if (error) { console.error('removeService:', error); return false; }
+      cachedServices = cachedServices.filter(s => s.id !== id);
+      return true;
+    }
+
+    // --- Settings ---
+    async function fetchSettings() {
+      const { data, error } = await sb.from('user_settings')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .single();
+      if (error && error.code !== 'PGRST116') { console.error('fetchSettings:', error); }
+      cachedSettings = data || { reminder_enabled: false, reminder_template: DEFAULT_REMINDER_MSG, reminded_ids: [] };
+      return cachedSettings;
+    }
+
+    async function saveSettings(updates) {
+      const payload = { ...updates, user_id: currentUser.id, updated_at: new Date().toISOString() };
+      const { error } = await sb.from('user_settings').upsert(payload);
+      if (error) { console.error('saveSettings:', error); return false; }
+      cachedSettings = { ...cachedSettings, ...updates };
+      return true;
+    }
+
+    // ═══════════════════════════════════════════
+    // TOAST
+    // ═══════════════════════════════════════════
     function showToast(msg, isError = false) {
       const c = document.getElementById('toast-container');
       const t = document.createElement('div');
@@ -760,7 +1405,9 @@
       setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(-10px)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, 3500);
     }
 
-    // ═══ TAB SWITCHING ═══
+    // ═══════════════════════════════════════════
+    // TAB SWITCHING
+    // ═══════════════════════════════════════════
     let currentTab = 'dashboard';
     function switchTab(tab) {
       currentTab = tab;
@@ -776,7 +1423,9 @@
       if (tab === 'settings') renderSettings();
     }
 
-    // ═══ GREETING ═══
+    // ═══════════════════════════════════════════
+    // GREETING
+    // ═══════════════════════════════════════════
     function updateGreeting() {
       const h = new Date().getHours();
       let g = 'Buenas noches';
@@ -785,7 +1434,9 @@
       document.getElementById('header-greeting').textContent = g;
     }
 
-    // ═══ DATE NAV ═══
+    // ═══════════════════════════════════════════
+    // DATE NAV
+    // ═══════════════════════════════════════════
     let selectedDate = new Date(); selectedDate.setHours(0,0,0,0);
     const DAYS_ES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -804,14 +1455,21 @@
       }
     }
 
-    // ═══ DASHBOARD ═══
-    function renderDashboard() { renderDateChips(); renderAppointments(); checkReminders(); }
+    // ═══════════════════════════════════════════
+    // DASHBOARD
+    // ═══════════════════════════════════════════
+    async function renderDashboard() { renderDateChips(); await renderAppointments(); checkReminders(); }
 
-    function renderAppointments() {
+    async function renderAppointments() {
       const container = document.getElementById('appt-list');
-      const all = getAppointments();
+      // Use cached data — already fetched
+      const all = cachedAppointments;
       const dateStr = selectedDate.toISOString().split('T')[0];
-      const day = all.filter(a => new Date(a.fecha_hora).toISOString().split('T')[0] === dateStr);
+      const day = all.filter(a => {
+        const aDate = new Date(a.fecha_hora);
+        const aStr = aDate.getFullYear() + '-' + String(aDate.getMonth()+1).padStart(2,'0') + '-' + String(aDate.getDate()).padStart(2,'0');
+        return aStr === dateStr;
+      });
       day.sort((a,b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
 
       const conf = day.filter(a=>a.estado==='confirmado').length;
@@ -871,24 +1529,32 @@
       document.querySelectorAll('.status-dropdown').forEach(d => { if(d.id!==`dropdown-${id}`) d.classList.remove('open'); });
       dd.classList.toggle('open');
     }
-    function changeStatus(id, s, e) {
+
+    async function changeStatus(id, s, e) {
       e.stopPropagation(); e.preventDefault();
-      const a = getAppointments(); const i = a.findIndex(x=>x.id===id);
-      if (i!==-1) { a[i].estado=s; a[i].updated_at=new Date().toISOString(); saveAppointments(a); renderAppointments(); showToast(`Estado: ${s.charAt(0).toUpperCase()+s.slice(1)}`); }
+      const ok = await updateAppointmentStatus(id, s);
+      if (ok) {
+        renderAppointments();
+        showToast(`Estado: ${s.charAt(0).toUpperCase()+s.slice(1)}`);
+      } else {
+        showToast('Error al cambiar estado', true);
+      }
       document.querySelectorAll('.status-dropdown').forEach(d=>d.classList.remove('open'));
     }
     document.addEventListener('click', e => { if(!e.target.closest('.btn-status-toggle')) document.querySelectorAll('.status-dropdown').forEach(d=>d.classList.remove('open')); });
 
-    // ═══ REMINDERS ═══
+    // ═══════════════════════════════════════════
+    // REMINDERS
+    // ═══════════════════════════════════════════
     function checkReminders() {
       const bc = document.getElementById('reminder-banner-container'); bc.innerHTML = '';
-      if (!isReminderEnabled()) return;
-      const all = getAppointments(); const now = new Date();
+      if (!cachedSettings || !cachedSettings.reminder_enabled) return;
+      const all = cachedAppointments; const now = new Date();
       const tmrw = new Date(now.getTime()+24*60*60*1000);
-      const reminded = getRemindedIds();
+      const reminded = cachedSettings.reminded_ids || [];
       const upcoming = all.filter(a => { const d=new Date(a.fecha_hora); return d>now&&d<=tmrw&&a.estado==='pendiente'&&!reminded.includes(a.id); });
       if (upcoming.length===0) return;
-      const tpl = getReminderTemplate();
+      const tpl = cachedSettings.reminder_template || DEFAULT_REMINDER_MSG;
       const items = upcoming.map(a => {
         const dt=new Date(a.fecha_hora); let h=dt.getHours(); const m=String(dt.getMinutes()).padStart(2,'0');
         const p=h>=12?'PM':'AM'; if(h>12)h-=12; if(h===0)h=12; const ts=`${h}:${m} ${p}`;
@@ -898,37 +1564,56 @@
       }).join('');
       bc.innerHTML = `<div class="reminder-banner"><div class="rb-title">🔔 Recordatorios pendientes (${upcoming.length})</div>${items}</div>`;
     }
-    function markReminded(id) {
-      const ids=getRemindedIds(); if(!ids.includes(id)){ids.push(id);setData(STORAGE_KEYS.remindedIds,ids);}
-      setTimeout(()=>checkReminders(),500);
-    }
-    function toggleReminder() {
-      const en=document.getElementById('toggle-reminder').checked;
-      setData(STORAGE_KEYS.reminderEnabled,en);
-      document.getElementById('reminder-template-area').classList.toggle('visible',en);
-    }
-    function saveReminderTemplate() { setData(STORAGE_KEYS.reminderTemplate,document.getElementById('reminder-msg-template').value); }
 
-    // ═══ SERVICE CHIPS ═══
+    async function markReminded(id) {
+      const ids = [...(cachedSettings.reminded_ids || [])];
+      if (!ids.includes(id)) {
+        ids.push(id);
+        await saveSettings({ user_id: currentUser.id, reminded_ids: ids });
+      }
+      setTimeout(()=>checkReminders(), 500);
+    }
+
+    async function toggleReminder() {
+      const en = document.getElementById('toggle-reminder').checked;
+      await saveSettings({ user_id: currentUser.id, reminder_enabled: en });
+      document.getElementById('reminder-template-area').classList.toggle('visible', en);
+    }
+
+    let templateDebounce;
+    async function saveReminderTemplate() {
+      clearTimeout(templateDebounce);
+      templateDebounce = setTimeout(async () => {
+        await saveSettings({ user_id: currentUser.id, reminder_template: document.getElementById('reminder-msg-template').value });
+      }, 500);
+    }
+
+    // ═══════════════════════════════════════════
+    // SERVICE CHIPS
+    // ═══════════════════════════════════════════
     function renderServiceChips() {
-      const c=document.getElementById('service-chips'); const s=getServices();
-      if(s.length===0){c.innerHTML='<span class="no-services-msg">No hay servicios. Agregalos en Ajustes.</span>';return;}
-      c.innerHTML=s.map(x=>`<span class="service-chip" onclick="selectService(this,'${x.name.replace(/'/g,"\\'")}')">${x.emoji} ${x.name}</span>`).join('');
+      const c=document.getElementById('service-chips');
+      if(cachedServices.length===0){c.innerHTML='<span class="no-services-msg">No hay servicios. Agregalos en Ajustes.</span>';return;}
+      c.innerHTML=cachedServices.map(x=>`<span class="service-chip" onclick="selectService(this,'${x.name.replace(/'/g,"\\'")}')">${x.emoji} ${x.name}</span>`).join('');
     }
     function selectService(el,n){document.getElementById('inp-service').value=n;document.querySelectorAll('.service-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
 
-    // ═══ CLIENT AUTOCOMPLETE ═══
+    // ═══════════════════════════════════════════
+    // CLIENT AUTOCOMPLETE
+    // ═══════════════════════════════════════════
     function onNameInput(v) {
       const b=document.getElementById('ac-box');
       if(v.length<2){b.classList.remove('open');return;}
-      const cl=getClients().filter(c=>c.nombre.toLowerCase().includes(v.toLowerCase()));
+      const cl=cachedClients.filter(c=>c.nombre.toLowerCase().includes(v.toLowerCase()));
       if(!cl.length){b.classList.remove('open');return;}
       b.innerHTML=cl.map(c=>`<div class="ac-item" onclick="selectClient('${c.nombre.replace(/'/g,"\\'")}','${c.telefono||''}')"><div><span class="ac-name">${c.nombre}</span><span class="ac-phone">📱 ${c.telefono||'Sin teléfono'}</span></div></div>`).join('');
       b.classList.add('open');
     }
     function selectClient(n,p){document.getElementById('inp-name').value=n;if(p)document.getElementById('inp-phone').value=p;document.getElementById('ac-box').classList.remove('open');if(p)onPhoneInput(p);}
 
-    // ═══ PHONE ═══
+    // ═══════════════════════════════════════════
+    // PHONE
+    // ═══════════════════════════════════════════
     let phoneDebounce;
     function onPhoneInput(v) {
       clearTimeout(phoneDebounce); const pill=document.getElementById('wa-pill'); const cl=v.replace(/\D/g,'');
@@ -937,8 +1622,10 @@
       phoneDebounce=setTimeout(()=>{pill.className='wa-pill valid';pill.textContent='✅ WhatsApp Activo';},600);
     }
 
-    // ═══ SAVE APPOINTMENT ═══
-    function saveAppointment() {
+    // ═══════════════════════════════════════════
+    // SAVE APPOINTMENT
+    // ═══════════════════════════════════════════
+    async function saveAppointment() {
       const name=document.getElementById('inp-name').value.trim();
       const svc=document.getElementById('inp-service').value.trim();
       const phone=document.getElementById('inp-phone').value.trim();
@@ -947,12 +1634,20 @@
       if(!svc){showToast('Seleccioná o escribí un servicio',true);return;}
       if(!dt){showToast('Seleccioná fecha y hora',true);return;}
 
-      const appt={id:'appt_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),nombre:name,servicio:svc,telefono:phone,fecha_hora:new Date(dt).toISOString(),estado:'pendiente',created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
-      const a=getAppointments();a.push(appt);saveAppointments(a);
+      const appt = await insertAppointment({
+        nombre: name,
+        servicio: svc,
+        telefono: phone,
+        fecha_hora: new Date(dt).toISOString(),
+      });
 
-      const cl=getClients();const ex=cl.findIndex(c=>c.nombre.toLowerCase()===name.toLowerCase());
-      if(ex>=0){if(phone)cl[ex].telefono=phone;}else{cl.push({nombre:name,telefono:phone});}
-      saveClients(cl);
+      if (!appt) {
+        showToast('Error al guardar la cita', true);
+        return;
+      }
+
+      // Upsert client
+      await upsertClient(name, phone);
 
       document.getElementById('inp-name').value='';document.getElementById('inp-service').value='';
       document.getElementById('inp-phone').value='';document.getElementById('wa-pill').style.display='none';
@@ -963,9 +1658,11 @@
     }
     function setDefaultDateTime(){const n=new Date();n.setMinutes(0,0,0);n.setHours(n.getHours()+1);const o=n.getTimezoneOffset()*60000;document.getElementById('inp-datetime').value=new Date(n.getTime()-o).toISOString().slice(0,16);}
 
-    // ═══ CLIENTS VIEW ═══
+    // ═══════════════════════════════════════════
+    // CLIENTS VIEW
+    // ═══════════════════════════════════════════
     function renderClients(query='') {
-      const cl = getClients();
+      const cl = cachedClients;
       const q = (query||document.getElementById('inp-search-client')?.value||'').toLowerCase();
       const filtered = q ? cl.filter(c=>c.nombre.toLowerCase().includes(q)||(c.telefono||'').includes(q)) : cl;
       document.getElementById('client-count').textContent = `${cl.length} cliente${cl.length!==1?'s':''}`;
@@ -977,7 +1674,7 @@
       }
 
       // Count visits per client
-      const appts = getAppointments();
+      const appts = cachedAppointments;
       container.innerHTML = filtered.map(c => {
         const visits = appts.filter(a=>a.nombre.toLowerCase()===c.nombre.toLowerCase()).length;
         const lastAppt = appts.filter(a=>a.nombre.toLowerCase()===c.nombre.toLowerCase()).sort((a,b)=>new Date(b.fecha_hora)-new Date(a.fecha_hora))[0];
@@ -1011,28 +1708,77 @@
       if (phone) { document.getElementById('inp-phone').value = phone; onPhoneInput(phone); }
     }
 
-    // ═══ SETTINGS ═══
+    // ═══════════════════════════════════════════
+    // SETTINGS
+    // ═══════════════════════════════════════════
     function renderSettings() {
       renderServiceList();
-      const re=isReminderEnabled();
-      document.getElementById('toggle-reminder').checked=re;
-      document.getElementById('reminder-template-area').classList.toggle('visible',re);
-      document.getElementById('reminder-msg-template').value=getReminderTemplate();
+      const re = cachedSettings ? cachedSettings.reminder_enabled : false;
+      document.getElementById('toggle-reminder').checked = re;
+      document.getElementById('reminder-template-area').classList.toggle('visible', re);
+      document.getElementById('reminder-msg-template').value = (cachedSettings && cachedSettings.reminder_template) || DEFAULT_REMINDER_MSG;
     }
-    function renderServiceList() {
-      const c=document.getElementById('service-list');const s=getServices();
-      if(!s.length){c.innerHTML='<p style="font-size:13px;color:var(--text-muted);padding:8px 0;">No tenés servicios todavía. Agregá el primero abajo 👇</p>';return;}
-      c.innerHTML=s.map((x,i)=>`<div class="service-item"><span class="svc-emoji">${x.emoji}</span><span class="svc-name">${x.name}</span><button class="btn-delete-svc" onclick="deleteService(${i})" title="Eliminar">×</button></div>`).join('');
-    }
-    function addService(){const i=document.getElementById('inp-new-service');const n=i.value.trim();if(!n)return;const s=getServices();if(s.some(x=>x.name.toLowerCase()===n.toLowerCase())){showToast('Ese servicio ya existe',true);return;}s.push({name:n,emoji:'⭐'});saveServices(s);i.value='';renderServiceList();showToast(`"${n}" agregado`);}
-    function deleteService(i){const s=getServices();const n=s[i]?.name;s.splice(i,1);saveServices(s);renderServiceList();showToast(`"${n}" eliminado`);}
-    function clearAllData(){localStorage.removeItem(STORAGE_KEYS.appointments);localStorage.removeItem(STORAGE_KEYS.clients);localStorage.removeItem(STORAGE_KEYS.remindedIds);renderDashboard();showToast('Todas las citas eliminadas');}
 
-    // ═══ INIT ═══
-    updateGreeting();
-    setDefaultDateTime();
-    renderDashboard();
-    renderServiceChips();
+    function renderServiceList() {
+      const c=document.getElementById('service-list');
+      if(!cachedServices.length){c.innerHTML='<p style="font-size:13px;color:var(--text-muted);padding:8px 0;">No tenés servicios todavía. Agregá el primero abajo 👇</p>';return;}
+      c.innerHTML=cachedServices.map((x,i)=>`<div class="service-item"><span class="svc-emoji">${x.emoji}</span><span class="svc-name">${x.name}</span><button class="btn-delete-svc" onclick="deleteService('${x.id}')" title="Eliminar">×</button></div>`).join('');
+    }
+
+    async function addService() {
+      const i=document.getElementById('inp-new-service');const n=i.value.trim();if(!n)return;
+      if(cachedServices.some(x=>x.name.toLowerCase()===n.toLowerCase())){showToast('Ese servicio ya existe',true);return;}
+      const svc = await insertService(n);
+      if (svc) { i.value=''; renderServiceList(); showToast(`"${n}" agregado`); }
+      else { showToast('Error al agregar servicio', true); }
+    }
+
+    async function deleteService(id) {
+      const svc = cachedServices.find(s => s.id === id);
+      const ok = await removeService(id);
+      if (ok) { renderServiceList(); showToast(`"${svc?.name || 'Servicio'}" eliminado`); }
+    }
+
+    async function clearAllData() {
+      const ok = await deleteAllAppointments();
+      if (ok) { await fetchAppointments(); renderDashboard(); showToast('Todas las citas eliminadas'); }
+      else { showToast('Error al eliminar citas', true); }
+    }
+
+    // ═══════════════════════════════════════════
+    // APP INIT
+    // ═══════════════════════════════════════════
+    async function initApp() {
+      updateGreeting();
+      setDefaultDateTime();
+
+      // Migrate local data if exists
+      const didMigrate = await migrateLocalData();
+
+      // Fetch all data from Supabase
+      await Promise.all([
+        fetchAppointments(),
+        fetchClients(),
+        fetchServices(),
+        fetchSettings(),
+      ]);
+
+      if (didMigrate) {
+        // Refetch after migration to get the server-side IDs
+        await Promise.all([
+          fetchAppointments(),
+          fetchClients(),
+          fetchServices(),
+          fetchSettings(),
+        ]);
+        const mb = document.getElementById('migration-banner-container');
+        mb.innerHTML = '<div class="migration-banner">✅ Tus datos locales fueron migrados a la nube exitosamente.</div>';
+        setTimeout(() => { mb.innerHTML = ''; }, 6000);
+      }
+
+      renderDashboard();
+      renderServiceChips();
+    }
   </script>
 </body>
 </html>
