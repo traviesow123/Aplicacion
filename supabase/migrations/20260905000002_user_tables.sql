@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS user_appointments (
   reminder_sent BOOLEAN DEFAULT false,
   reminder_sent_at TIMESTAMPTZ,
   reminder_response TEXT,
+  notas TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -36,6 +37,9 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_appointments' AND column_name='reminder_response') THEN
     ALTER TABLE user_appointments ADD COLUMN reminder_response TEXT;
   END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_appointments' AND column_name='notas') THEN
+    ALTER TABLE user_appointments ADD COLUMN notas TEXT;
+  END IF;
 END $$;
 
 -- 2. Tabla de Clientes vinculada a auth.users
@@ -45,6 +49,7 @@ CREATE TABLE IF NOT EXISTS user_clients (
   nombre VARCHAR(255) NOT NULL,
   telefono VARCHAR(50),
   email VARCHAR(255),
+  notas TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, nombre)
 );
@@ -54,6 +59,9 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_clients' AND column_name='email') THEN
     ALTER TABLE user_clients ADD COLUMN email VARCHAR(255);
   END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_clients' AND column_name='notas') THEN
+    ALTER TABLE user_clients ADD COLUMN notas TEXT;
+  END IF;
 END $$;
 
 -- 3. Tabla de Servicios vinculada a auth.users
@@ -62,9 +70,21 @@ CREATE TABLE IF NOT EXISTS user_services (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   name VARCHAR(255) NOT NULL,
   emoji VARCHAR(10) DEFAULT '⭐',
+  duracion_min INTEGER DEFAULT 30,
+  precio NUMERIC(10,2),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, name)
 );
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_services' AND column_name='duracion_min') THEN
+    ALTER TABLE user_services ADD COLUMN duracion_min INTEGER DEFAULT 30;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_services' AND column_name='precio') THEN
+    ALTER TABLE user_services ADD COLUMN precio NUMERIC(10,2);
+  END IF;
+END $$;
 
 -- 4. Tabla de Configuración del Usuario
 CREATE TABLE IF NOT EXISTS user_settings (
@@ -72,6 +92,11 @@ CREATE TABLE IF NOT EXISTS user_settings (
   reminder_enabled BOOLEAN DEFAULT true,
   reminder_template TEXT DEFAULT 'Hola {nombre}, te recordamos tu cita para *{servicio}* mañana a las {hora}. ¿Confirmás tu asistencia? Respondé *SI* para confirmar o *NO* para cancelar.',
   email_reminder_enabled BOOLEAN DEFAULT true,
+  reminder_minutes_before INTEGER DEFAULT 15,
+  reminder_24h_enabled BOOLEAN DEFAULT true,
+  push_subscription JSONB,
+  push_enabled BOOLEAN DEFAULT true,
+  business_name VARCHAR(255),
   reminded_ids TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -81,6 +106,21 @@ DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_settings' AND column_name='email_reminder_enabled') THEN
     ALTER TABLE user_settings ADD COLUMN email_reminder_enabled BOOLEAN DEFAULT true;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_settings' AND column_name='reminder_minutes_before') THEN
+    ALTER TABLE user_settings ADD COLUMN reminder_minutes_before INTEGER DEFAULT 15;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_settings' AND column_name='reminder_24h_enabled') THEN
+    ALTER TABLE user_settings ADD COLUMN reminder_24h_enabled BOOLEAN DEFAULT true;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_settings' AND column_name='push_subscription') THEN
+    ALTER TABLE user_settings ADD COLUMN push_subscription JSONB;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_settings' AND column_name='push_enabled') THEN
+    ALTER TABLE user_settings ADD COLUMN push_enabled BOOLEAN DEFAULT true;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='user_settings' AND column_name='business_name') THEN
+    ALTER TABLE user_settings ADD COLUMN business_name VARCHAR(255);
   END IF;
 END $$;
 
@@ -106,6 +146,13 @@ CREATE POLICY "Users can update own appointments" ON user_appointments FOR UPDAT
 
 DROP POLICY IF EXISTS "Users can delete own appointments" ON user_appointments;
 CREATE POLICY "Users can delete own appointments" ON user_appointments FOR DELETE USING (auth.uid() = user_id);
+
+-- Service role bypass para cron jobs (recordatorios automáticos)
+DROP POLICY IF EXISTS "Service role full access appointments" ON user_appointments;
+CREATE POLICY "Service role full access appointments" ON user_appointments
+  FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
 
 -- Políticas para user_clients
 DROP POLICY IF EXISTS "Users can view own clients" ON user_clients;
@@ -143,6 +190,13 @@ CREATE POLICY "Users can insert own settings" ON user_settings FOR INSERT WITH C
 DROP POLICY IF EXISTS "Users can update own settings" ON user_settings;
 CREATE POLICY "Users can update own settings" ON user_settings FOR UPDATE USING (auth.uid() = user_id);
 
+-- Service role bypass para settings (leer templates de recordatorio)
+DROP POLICY IF EXISTS "Service role full access settings" ON user_settings;
+CREATE POLICY "Service role full access settings" ON user_settings
+  FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
 -- ============================================
 -- Índices de rendimiento
 -- ============================================
@@ -150,5 +204,7 @@ CREATE INDEX IF NOT EXISTS idx_appointments_user_date ON user_appointments(user_
 CREATE INDEX IF NOT EXISTS idx_appointments_user_estado ON user_appointments(user_id, estado);
 CREATE INDEX IF NOT EXISTS idx_appointments_auto_reminder ON user_appointments(estado, fecha_hora, reminder_sent);
 CREATE INDEX IF NOT EXISTS idx_appointments_phone ON user_appointments(telefono);
+CREATE INDEX IF NOT EXISTS idx_appointments_email ON user_appointments(email);
 CREATE INDEX IF NOT EXISTS idx_clients_user ON user_clients(user_id);
+CREATE INDEX IF NOT EXISTS idx_clients_phone ON user_clients(user_id, telefono);
 CREATE INDEX IF NOT EXISTS idx_services_user ON user_services(user_id);

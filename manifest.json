@@ -1,0 +1,26 @@
+{
+  "name": "Calendario Inteligente",
+  "short_name": "Calendario IA",
+  "description": "Tu asistente inteligente de citas con recordatorios automáticos por WhatsApp y correo electrónico.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0C0A09",
+  "theme_color": "#D4A853",
+  "lang": "es",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

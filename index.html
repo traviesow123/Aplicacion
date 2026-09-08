@@ -2,9 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Calendario Inteligente</title>
-  <meta name="description" content="Gestiona tus citas con tu calendario inteligente. Recordatorios automáticos por WhatsApp y correo para tu negocio.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Calendario Inteligente — Tu Asistente de Citas</title>
+  <meta name="description" content="Gestiona tus citas inteligentemente. Recordatorios automáticos por WhatsApp y correo para tu negocio. Sin mover un dedo.">
+  <meta name="theme-color" content="#0C0A09">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Calendario IA">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -45,16 +54,30 @@
     }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+      height: 100%;
+      overflow: hidden;
+    }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
-      min-height: 100vh;
-      min-height: 100dvh;
-      overflow-x: hidden;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
       -webkit-font-smoothing: antialiased;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    input, textarea, select, [contenteditable="true"] {
+      user-select: auto;
+      -webkit-user-select: auto;
     }
 
     /* ═══ AMBIENT BACKGROUND ═══ */
@@ -67,24 +90,9 @@
       filter: blur(130px); opacity: 0.09;
       animation: orbFloat 28s ease-in-out infinite;
     }
-    .orb-1 {
-      width: 500px; height: 500px;
-      background: #D4A853;
-      top: -160px; left: -60px;
-    }
-    .orb-2 {
-      width: 420px; height: 420px;
-      background: #E8758A;
-      bottom: -120px; right: -60px;
-      animation-delay: -10s;
-    }
-    .orb-3 {
-      width: 280px; height: 280px;
-      background: #C9956B;
-      top: 50%; left: 50%;
-      opacity: 0.05;
-      animation-delay: -18s;
-    }
+    .orb-1 { width: 500px; height: 500px; background: #D4A853; top: -160px; left: -60px; }
+    .orb-2 { width: 420px; height: 420px; background: #E8758A; bottom: -120px; right: -60px; animation-delay: -10s; }
+    .orb-3 { width: 280px; height: 280px; background: #C9956B; top: 50%; left: 50%; opacity: 0.05; animation-delay: -18s; }
     @keyframes orbFloat {
       0%, 100% { transform: translate(0, 0) scale(1); }
       33% { transform: translate(20px, -30px) scale(1.03); }
@@ -98,20 +106,13 @@
       padding: 24px;
       opacity: 1; transition: opacity 0.4s ease, transform 0.4s ease;
     }
-    .auth-screen.hidden {
-      opacity: 0; pointer-events: none; transform: scale(0.95);
-    }
-    .auth-container {
-      width: 100%; max-width: 400px;
-      animation: authSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    .auth-screen.hidden { opacity: 0; pointer-events: none; transform: scale(0.95); }
+    .auth-container { width: 100%; max-width: 400px; animation: authSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes authSlideIn {
       from { opacity: 0; transform: translateY(30px) scale(0.96); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .auth-logo {
-      text-align: center; margin-bottom: 32px;
-    }
+    .auth-logo { text-align: center; margin-bottom: 32px; }
     .auth-logo-icon {
       width: 72px; height: 72px; margin: 0 auto 16px;
       background: linear-gradient(135deg, var(--accent-primary), #C88B2E);
@@ -128,9 +129,7 @@
       background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent-primary));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .auth-logo p {
-      font-size: 14px; color: var(--text-muted); margin-top: 6px; font-weight: 500;
-    }
+    .auth-logo p { font-size: 14px; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
     .auth-card {
       background: var(--surface-card); backdrop-filter: blur(24px);
       border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);
@@ -138,8 +137,7 @@
     }
     .auth-tabs {
       display: flex; gap: 4px; margin-bottom: 24px;
-      background: rgba(12, 10, 9, 0.6); border-radius: var(--radius-sm);
-      padding: 4px;
+      background: rgba(12, 10, 9, 0.6); border-radius: var(--radius-sm); padding: 4px;
     }
     .auth-tab {
       flex: 1; padding: 10px; border: none; border-radius: 8px;
@@ -167,11 +165,8 @@
       color: var(--text-primary); font-size: 14px; font-weight: 500;
       font-family: inherit; outline: none; transition: all var(--transition-fast);
     }
-    .auth-input:focus {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-    .auth-input:focus + .auth-icon, .auth-input:focus ~ .auth-icon { color: var(--accent-primary); }
+    .auth-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .auth-input:focus ~ .auth-icon { color: var(--accent-primary); }
     .auth-input::placeholder { color: var(--text-muted); }
     .auth-btn {
       width: 100%; padding: 16px; border-radius: var(--radius-md); border: none;
@@ -183,10 +178,7 @@
     }
     .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212, 168, 83, 0.5); }
     .auth-btn:active { transform: translateY(0); }
-    .auth-btn:disabled {
-      opacity: 0.6; cursor: not-allowed; transform: none !important;
-      box-shadow: none !important;
-    }
+    .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
     .auth-btn .spinner {
       width: 18px; height: 18px; border: 2.5px solid rgba(12,10,9,0.3);
       border-top-color: #0C0A09; border-radius: 50%;
@@ -217,13 +209,6 @@
       display: none; align-items: center; gap: 8px;
     }
     .auth-success.visible { display: flex; }
-    .auth-divider {
-      display: flex; align-items: center; gap: 12px;
-      font-size: 12px; color: var(--text-muted); font-weight: 600;
-    }
-    .auth-divider::before, .auth-divider::after {
-      content: ''; flex: 1; height: 1px; background: var(--border-subtle);
-    }
 
     /* ═══ LOADING OVERLAY ═══ */
     .loading-overlay {
@@ -246,20 +231,26 @@
     .app-shell {
       position: relative; z-index: 1;
       max-width: 480px; margin: 0 auto;
-      min-height: 100vh; min-height: 100dvh;
+      height: 100%; height: 100dvh;
       display: flex; flex-direction: column;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.35s ease;
+      background: var(--bg-primary);
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(0,0,0,0.85);
     }
     .app-shell.visible { opacity: 1; pointer-events: auto; }
 
     /* ═══ HEADER ═══ */
     .app-top-header {
-      padding: 16px 20px 8px;
+      padding-top: max(14px, env(safe-area-inset-top, 0px));
+      padding-left: max(18px, env(safe-area-inset-left, 0px));
+      padding-right: max(18px, env(safe-area-inset-right, 0px));
+      padding-bottom: 12px;
       display: flex; justify-content: space-between; align-items: center;
       position: sticky; top: 0; z-index: 50;
-      background: rgba(12, 10, 9, 0.9);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      background: rgba(12, 10, 9, 0.94);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
       border-bottom: 1px solid var(--border-subtle);
     }
     .header-left { display: flex; flex-direction: column; }
@@ -287,34 +278,62 @@
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(0.7); }
     }
-    .btn-logout {
+    .btn-icon-header {
       width: 38px; height: 38px; border-radius: 50%;
-      background: rgba(244, 114, 182, 0.08); border: 1px solid rgba(244, 114, 182, 0.2);
-      color: var(--accent-rose); display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: all var(--transition-fast);
+      border: 1px solid; background: transparent;
     }
-    .btn-logout:hover {
-      background: rgba(244, 114, 182, 0.2); transform: scale(1.08);
-      box-shadow: 0 0 16px rgba(244, 114, 182, 0.2);
+    .btn-logout {
+      background: rgba(244, 114, 182, 0.08); border-color: rgba(244, 114, 182, 0.2);
+      color: var(--accent-rose);
     }
+    .btn-logout:hover { background: rgba(244, 114, 182, 0.2); transform: scale(1.08); box-shadow: 0 0 16px rgba(244, 114, 182, 0.2); }
 
     /* ═══ CONTENT AREA ═══ */
     .content-area {
       flex: 1; overflow-y: auto; overflow-x: hidden;
-      padding: 16px 18px 100px;
+      padding-top: 14px;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+      padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px));
       scrollbar-width: none;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
     }
-    .content-area::-webkit-scrollbar { width: 0; }
+    .content-area::-webkit-scrollbar { width: 0; display: none; }
 
     /* ═══ VIEWS ═══ */
-    .view {
-      display: none; flex-direction: column; gap: 14px;
-      animation: viewFadeIn 0.3s ease;
-    }
+    .view { display: none; flex-direction: column; gap: 14px; animation: viewFadeIn 0.3s ease; }
     .view.active { display: flex; }
     @keyframes viewFadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══ NEXT APPOINTMENT COUNTDOWN ═══ */
+    .next-appt-banner {
+      background: linear-gradient(135deg, rgba(212,168,83,0.12), rgba(200,139,46,0.06));
+      border: 1px solid rgba(212,168,83,0.2);
+      border-radius: var(--radius-md); padding: 14px 16px;
+      display: none; align-items: center; gap: 12px;
+      animation: viewFadeIn 0.3s ease;
+    }
+    .next-appt-banner.visible { display: flex; }
+    .next-appt-icon {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: rgba(212,168,83,0.15); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .next-appt-info { flex: 1; min-width: 0; }
+    .next-appt-label { font-size: 11px; font-weight: 700; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .next-appt-detail { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-top: 2px; }
+    .next-appt-countdown {
+      font-size: 13px; font-weight: 800; color: var(--accent-primary);
+      background: rgba(212,168,83,0.1); padding: 4px 10px;
+      border-radius: 8px; white-space: nowrap;
     }
 
     /* ═══ STATS ═══ */
@@ -355,6 +374,11 @@
     .date-chip .day-name { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
     .date-chip .day-num { font-size: 18px; font-weight: 800; }
     .date-chip.active .day-name, .date-chip.active .day-num { color: var(--accent-primary); }
+    .date-chip.has-appts .day-num::after {
+      content: ''; display: block; width: 5px; height: 5px;
+      background: var(--accent-primary); border-radius: 50%;
+      margin: 3px auto 0;
+    }
 
     /* ═══ APPOINTMENT CARDS ═══ */
     .appt-list { display: flex; flex-direction: column; gap: 10px; }
@@ -412,14 +436,7 @@
     }
     .btn-mail:hover { background: var(--accent-secondary); color: #000; transform: scale(1.1); box-shadow: 0 0 20px rgba(192, 132, 252, 0.4); }
 
-    .badge-optional {
-      font-size: 10px; font-weight: 600; text-transform: none;
-      color: var(--text-muted); background: rgba(255, 255, 255, 0.06);
-      padding: 2px 8px; border-radius: 6px;
-    }
-    .appt-email {
-      font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; margin-top: 2px;
-    }
+    .appt-email { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; margin-top: 2px; }
     .appt-reminder-status {
       font-size: 10px; font-weight: 700; color: var(--accent-primary);
       background: rgba(212, 168, 83, 0.12); border: 1px solid rgba(212, 168, 83, 0.25);
@@ -438,7 +455,6 @@
       cursor: pointer; transition: all var(--transition-fast); position: relative;
     }
     .btn-status-toggle:hover { background: rgba(212,168,83,0.2); }
-
     .status-dropdown {
       display: none; position: absolute; right: 0; top: 44px;
       background: var(--bg-elevated); border: 1px solid rgba(255,255,255,0.1);
@@ -453,6 +469,20 @@
     }
     .status-option:hover { background: rgba(255,255,255,0.06); }
     .status-option .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ═══ SKELETON LOADING ═══ */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface-glass) 25%, rgba(255,255,255,0.06) 50%, var(--surface-glass) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+      border-radius: var(--radius-sm);
+    }
+    @keyframes skeletonShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-card { height: 80px; border-radius: var(--radius-md); margin-bottom: 10px; }
+    .skeleton-stat { height: 72px; border-radius: var(--radius-md); }
 
     /* ═══ EMPTY STATE ═══ */
     .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
@@ -488,7 +518,6 @@
     .form-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
       filter: invert(0.6) sepia(0.5) hue-rotate(10deg); cursor: pointer;
     }
-
     .chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .service-chip {
       background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle);
@@ -500,14 +529,17 @@
       background: rgba(212,168,83,0.15); border-color: var(--accent-primary); color: var(--accent-primary);
     }
     .no-services-msg { font-size: 12px; color: var(--text-muted); padding: 6px 0; font-style: italic; }
-
     .wa-pill {
       display: none; align-items: center; gap: 4px;
       font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px;
     }
     .wa-pill.valid { display: inline-flex; background: rgba(37,211,102,0.15); color: var(--accent-whatsapp); border: 1px solid rgba(37,211,102,0.3); }
     .wa-pill.checking { display: inline-flex; background: rgba(212,168,83,0.15); color: var(--accent-primary); border: 1px solid rgba(212,168,83,0.3); }
-
+    .badge-optional {
+      font-size: 10px; font-weight: 600; text-transform: none;
+      color: var(--text-muted); background: rgba(255, 255, 255, 0.06);
+      padding: 2px 8px; border-radius: 6px;
+    }
     .btn-submit {
       width: 100%; padding: 16px; border-radius: var(--radius-md); border: none;
       background: linear-gradient(135deg, var(--accent-primary), #C88B2E);
@@ -518,7 +550,7 @@
     }
     .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,168,83,0.5); }
     .btn-submit:active { transform: translateY(0); }
-
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
     .autocomplete-box {
       display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0;
       background: var(--bg-elevated); border: 1px solid rgba(212,168,83,0.3);
@@ -540,12 +572,16 @@
     /* ═══ BOTTOM NAV ═══ */
     .bottom-nav {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 480px; height: 72px;
-      background: rgba(12,10,9,0.94);
-      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      width: 100%; max-width: 480px;
+      height: calc(68px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-left: max(6px, env(safe-area-inset-left, 0px));
+      padding-right: max(6px, env(safe-area-inset-right, 0px));
+      background: rgba(12,10,9,0.96);
+      backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
       border-top: 1px solid var(--border-subtle);
       display: flex; justify-content: space-around; align-items: center;
-      padding: 0 4px; z-index: 100;
+      z-index: 100;
       opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
     }
     .bottom-nav.visible { opacity: 1; pointer-events: auto; }
@@ -577,6 +613,20 @@
     @keyframes toastSlide {
       from { transform: translateY(-20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ═══ CONFETTI ═══ */
+    .confetti-container {
+      position: fixed; inset: 0; z-index: 300; pointer-events: none; overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute; width: 10px; height: 10px;
+      top: -10px; opacity: 0;
+      animation: confettiFall 2.5s ease-out forwards;
+    }
+    @keyframes confettiFall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg) scale(0.5); }
     }
 
     /* ═══ SETTINGS ═══ */
@@ -617,8 +667,6 @@
       font-size: 13px; cursor: pointer; font-family: inherit; transition: all var(--transition-fast);
     }
     .btn-add-svc:hover { background: #E0B96A; }
-
-    /* Toggle switch */
     .toggle-row {
       display: flex; justify-content: space-between; align-items: center;
       padding: 12px 0; gap: 12px;
@@ -655,11 +703,17 @@
     }
     .reminder-template textarea:focus { border-color: var(--accent-primary); }
     .reminder-template .hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.4; }
+    .reminder-time-select {
+      width: 100%; background: rgba(12,10,9,0.85);
+      border: 1px solid var(--border-subtle); padding: 10px 14px;
+      border-radius: var(--radius-sm); color: var(--text-primary);
+      font-size: 13px; font-family: inherit; outline: none;
+      margin-top: 8px; appearance: auto;
+    }
+    .reminder-time-select:focus { border-color: var(--accent-primary); }
 
     /* ═══ CLIENTS VIEW ═══ */
-    .search-bar {
-      position: relative; margin-bottom: 4px;
-    }
+    .search-bar { position: relative; margin-bottom: 4px; }
     .search-bar .icon {
       position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
       color: var(--text-muted); display: flex; pointer-events: none;
@@ -673,7 +727,6 @@
     }
     .search-bar input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-glow); }
     .search-bar input::placeholder { color: var(--text-muted); }
-
     .client-list { display: flex; flex-direction: column; gap: 8px; }
     .client-card {
       background: var(--surface-card); border: 1px solid var(--border-subtle);
@@ -708,10 +761,7 @@
       border-radius: var(--radius-md); padding: 14px 16px;
       display: flex; flex-direction: column; gap: 8px;
     }
-    .reminder-banner .rb-title {
-      font-size: 14px; font-weight: 700; color: var(--accent-primary);
-      display: flex; align-items: center; gap: 6px;
-    }
+    .reminder-banner .rb-title { font-size: 14px; font-weight: 700; color: var(--accent-primary); display: flex; align-items: center; gap: 6px; }
     .reminder-banner .rb-item {
       display: flex; align-items: center; justify-content: space-between;
       padding: 8px 10px; background: rgba(0,0,0,0.2); border-radius: var(--radius-sm); font-size: 13px;
@@ -730,13 +780,38 @@
       border-bottom: 1px solid var(--border-subtle);
       font-size: 12px; color: var(--text-muted);
     }
-    .user-info-bar .user-email {
-      flex: 1; font-weight: 600; overflow: hidden;
-      text-overflow: ellipsis; white-space: nowrap;
+    .user-info-bar .user-email { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .user-info-bar .user-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-teal); }
+
+    /* ═══ OFFLINE BANNER ═══ */
+    .offline-banner {
+      display: none; align-items: center; justify-content: center; gap: 8px;
+      background: rgba(244,114,182,0.1); border-bottom: 1px solid rgba(244,114,182,0.2);
+      padding: 8px; font-size: 12px; font-weight: 700; color: var(--accent-rose);
     }
-    .user-info-bar .user-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--accent-teal);
+    .offline-banner.visible { display: flex; }
+
+    /* ═══ INSTALL PROMPT ═══ */
+    .install-banner {
+      display: none; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, rgba(212,168,83,0.12), rgba(200,139,46,0.06));
+      border: 1px solid rgba(212,168,83,0.2);
+      border-radius: var(--radius-md); padding: 12px 16px;
+      animation: viewFadeIn 0.3s ease;
+    }
+    .install-banner.visible { display: flex; }
+    .install-banner .install-text { flex: 1; font-size: 13px; font-weight: 600; }
+    .install-banner .install-text span { color: var(--accent-primary); }
+    .btn-install {
+      padding: 8px 16px; border-radius: 10px; border: none;
+      background: var(--accent-primary); color: #0C0A09;
+      font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit;
+      white-space: nowrap; transition: all var(--transition-fast);
+    }
+    .btn-install:hover { transform: scale(1.05); }
+    .btn-dismiss-install {
+      background: none; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 18px; padding: 4px; line-height: 1;
     }
 
     /* ═══ MIGRATION BANNER ═══ */
@@ -747,6 +822,263 @@
       font-size: 13px; color: var(--accent-teal); font-weight: 600;
       animation: viewFadeIn 0.3s ease;
     }
+
+    /* ═══ MOBILE PULL TO REFRESH ═══ */
+    .ptr-container {
+      overflow: hidden; height: 0; opacity: 0;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      color: var(--accent-primary); font-size: 12px; font-weight: 700;
+      transition: height 0.2s ease, opacity 0.2s ease;
+      margin-bottom: 6px;
+    }
+    .ptr-container.pulling { opacity: 1; }
+    .ptr-container.refreshing { height: 44px; opacity: 1; }
+    .ptr-spinner {
+      width: 18px; height: 18px; border: 2.5px solid rgba(212,168,83,0.2);
+      border-top-color: var(--accent-primary); border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    /* ═══ FLOATING VOICE MAGIC BUTTON (FAB) ═══ */
+    .fab-voice {
+      position: fixed;
+      right: calc(50% - 240px + 20px);
+      bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+      z-index: 90;
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 18px;
+      background: linear-gradient(135deg, #D4A853, #C88B2E);
+      color: #0C0A09;
+      border: none; border-radius: 30px;
+      font-size: 14px; font-weight: 800; font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 8px 28px rgba(212,168,83,0.45);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @media (max-width: 480px) {
+      .fab-voice { right: 18px; }
+    }
+    .fab-voice:active { transform: scale(0.94); }
+    .fab-voice-pulse {
+      position: absolute; inset: -4px; border-radius: 34px;
+      border: 2px solid rgba(212,168,83,0.6);
+      animation: fabPulse 2.4s ease-out infinite;
+      pointer-events: none;
+    }
+    @keyframes fabPulse {
+      0% { transform: scale(0.96); opacity: 1; }
+      100% { transform: scale(1.15); opacity: 0; }
+    }
+
+    /* ═══ VOICE MAGIC INLINE CARD (NUEVA CITA) ═══ */
+    .voice-magic-card {
+      background: linear-gradient(135deg, rgba(212,168,83,0.14), rgba(192,132,252,0.08));
+      border: 1px solid rgba(212,168,83,0.3);
+      border-radius: var(--radius-md);
+      padding: 14px 16px; margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      cursor: pointer; transition: all var(--transition-fast);
+    }
+    .voice-magic-card:active { transform: scale(0.98); background: rgba(212,168,83,0.2); }
+    .vmc-left { display: flex; align-items: center; gap: 12px; }
+    .vmc-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-primary), #C88B2E);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; box-shadow: 0 4px 16px rgba(212,168,83,0.3);
+      flex-shrink: 0;
+    }
+    .vmc-text { display: flex; flex-direction: column; }
+    .vmc-title { font-size: 14px; font-weight: 800; color: var(--text-primary); }
+    .vmc-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .btn-vmc-action {
+      padding: 8px 14px; border-radius: 20px; border: 1px solid rgba(212,168,83,0.4);
+      background: rgba(212,168,83,0.15); color: var(--accent-primary);
+      font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; font-family: inherit;
+    }
+
+    /* ═══ CONTACT PICK BUTTON ═══ */
+    .btn-contact-pick {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(212,168,83,0.3);
+      background: rgba(212,168,83,0.1); color: var(--accent-primary);
+      font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit;
+      transition: all var(--transition-fast);
+    }
+    .btn-contact-pick:active { transform: scale(0.95); background: rgba(212,168,83,0.25); }
+
+    /* ═══ BOTTOM SHEET COMPONENT (NATIVE MOBILE) ═══ */
+    .sheet-backdrop {
+      position: fixed; inset: 0; z-index: 700;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .bottom-sheet {
+      position: fixed; bottom: 0; left: 50%; transform: translate(-50%, 100%);
+      width: 100%; max-width: 480px;
+      max-height: 85vh; max-height: 85dvh;
+      background: var(--bg-secondary);
+      border-top-left-radius: 28px; border-top-right-radius: 28px;
+      border: 1px solid var(--border-subtle); border-bottom: none;
+      z-index: 750;
+      padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.85);
+      display: flex; flex-direction: column;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+    .bottom-sheet.open { transform: translate(-50%, 0); }
+
+    .sheet-handle-bar {
+      width: 100%; padding: 12px 0 6px;
+      display: flex; justify-content: center; align-items: center;
+      cursor: grab; flex-shrink: 0;
+    }
+    .sheet-handle {
+      width: 42px; height: 5px; border-radius: 3px;
+      background: rgba(255,255,255,0.2);
+    }
+
+    .sheet-content {
+      padding: 10px 20px 16px;
+      overflow-y: auto; flex: 1;
+      scrollbar-width: none;
+    }
+    .sheet-content::-webkit-scrollbar { display: none; }
+
+    .sheet-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px;
+    }
+    .sheet-title { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+    .btn-sheet-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,0.07); border: none;
+      color: var(--text-muted); font-size: 20px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+
+    /* ═══ VOICE MAGIC SHEET DETAILS ═══ */
+    .voice-visualizer {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 18px 0 12px;
+    }
+    .voice-orb {
+      position: relative; width: 88px; height: 88px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; margin-bottom: 16px;
+    }
+    .voice-orb-core {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-primary), #C88B2E);
+      color: #0C0A09;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 30px rgba(212,168,83,0.45);
+      z-index: 2; transition: all 0.25s ease;
+    }
+    .voice-orb:active .voice-orb-core { transform: scale(0.92); }
+    .voice-orb-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 2px solid var(--accent-primary);
+      opacity: 0; pointer-events: none;
+    }
+    .voice-orb.recording .ring-1 { animation: voiceWave 1.8s ease-out infinite; }
+    .voice-orb.recording .ring-2 { animation: voiceWave 1.8s ease-out 0.6s infinite; }
+    .voice-orb.recording .ring-3 { animation: voiceWave 1.8s ease-out 1.2s infinite; }
+    .voice-orb.recording .voice-orb-core {
+      background: linear-gradient(135deg, var(--accent-rose), #D94E6E);
+      box-shadow: 0 8px 36px rgba(244,114,182,0.6);
+    }
+    @keyframes voiceWave {
+      0% { transform: scale(0.9); opacity: 0.9; }
+      100% { transform: scale(2.1); opacity: 0; }
+    }
+    .voice-status-text { font-size: 15px; font-weight: 700; color: var(--text-primary); text-align: center; }
+    .voice-hint-text { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 6px; font-style: italic; }
+
+    .voice-transcript-box {
+      background: rgba(12,10,9,0.7); border: 1px solid rgba(212,168,83,0.25);
+      border-radius: var(--radius-md); padding: 12px 16px; margin: 12px 0;
+    }
+    .voice-transcript-label { font-size: 11px; font-weight: 700; color: var(--accent-primary); text-transform: uppercase; margin-bottom: 4px; }
+    .voice-transcript-text { font-size: 14px; color: var(--text-primary); font-style: italic; line-height: 1.4; }
+
+    .voice-parsed-card {
+      background: var(--surface-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: 14px; margin: 12px 0;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .parsed-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+    .parsed-label { color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .parsed-val { color: var(--text-primary); font-weight: 700; }
+    .btn-voice-confirm {
+      width: 100%; padding: 15px; border-radius: var(--radius-md); border: none;
+      background: linear-gradient(135deg, var(--accent-teal), #2A9D8F);
+      color: #0C0A09; font-size: 15px; font-weight: 800; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 8px; box-shadow: 0 6px 24px rgba(78,205,196,0.35);
+      transition: all var(--transition-fast);
+    }
+    .btn-voice-confirm:active { transform: scale(0.97); }
+
+    .voice-fallback-row {
+      display: flex; gap: 8px; margin-top: 14px;
+    }
+    .voice-fallback-row input {
+      flex: 1; background: rgba(12,10,9,0.8); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm); padding: 10px 12px; color: var(--text-primary);
+      font-size: 13px; font-family: inherit; outline: none;
+    }
+    .voice-fallback-row input:focus { border-color: var(--accent-primary); }
+    .btn-voice-parse {
+      padding: 10px 14px; border-radius: var(--radius-sm); border: none;
+      background: rgba(212,168,83,0.15); color: var(--accent-primary);
+      font-weight: 700; font-size: 12px; cursor: pointer; white-space: nowrap; font-family: inherit;
+    }
+
+    /* ═══ APPOINTMENT ACTION SHEET ═══ */
+    .sheet-appt-summary {
+      background: var(--surface-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: 16px; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .sas-avatar {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: rgba(212,168,83,0.15); color: var(--accent-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800; flex-shrink: 0;
+    }
+    .sas-info { flex: 1; min-width: 0; }
+    .sas-name { font-size: 16px; font-weight: 800; color: var(--text-primary); }
+    .sas-meta { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .action-sheet-options { display: flex; flex-direction: column; gap: 8px; }
+    .action-option-btn {
+      width: 100%; padding: 14px 16px; border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle); background: var(--surface-card);
+      color: var(--text-primary); font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; gap: 12px; cursor: pointer;
+      transition: all var(--transition-fast); text-decoration: none; font-family: inherit;
+    }
+    .action-option-btn:active { transform: scale(0.98); background: var(--surface-hover); }
+    .action-option-btn.btn-wa-action {
+      background: rgba(37,211,102,0.12); border-color: rgba(37,211,102,0.3); color: var(--accent-whatsapp);
+    }
+    .action-option-btn.btn-danger-action {
+      background: rgba(244,114,182,0.08); border-color: rgba(244,114,182,0.25); color: var(--accent-rose);
+    }
+    .btn-vcf {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(212,168,83,0.1); border: 1px solid rgba(212,168,83,0.25);
+      color: var(--accent-primary); display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 14px; transition: all var(--transition-fast);
+      border: none;
+    }
+    .btn-vcf:active { transform: scale(0.9); }
 
     @media (max-width: 480px) {
       .app-shell { max-width: 100%; }
@@ -762,6 +1094,7 @@
   </div>
 
   <div id="toast-container" class="toast-container"></div>
+  <div id="confetti-container" class="confetti-container"></div>
 
   <!-- LOADING OVERLAY -->
   <div id="loading-overlay" class="loading-overlay">
@@ -789,7 +1122,6 @@
           <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Crear Cuenta</button>
         </div>
 
-        <!-- LOGIN FORM -->
         <form id="form-login" class="auth-form active" onsubmit="handleLogin(event)">
           <div id="login-error" class="auth-error">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -797,15 +1129,11 @@
           </div>
           <div class="auth-input-group">
             <input type="email" id="login-email" class="auth-input" placeholder="Correo electrónico" required autocomplete="email">
-            <span class="auth-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            </span>
+            <span class="auth-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
           </div>
           <div class="auth-input-group">
             <input type="password" id="login-password" class="auth-input" placeholder="Contraseña" required minlength="6" autocomplete="current-password">
-            <span class="auth-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            </span>
+            <span class="auth-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
           </div>
           <button type="submit" class="auth-btn" id="btn-login">
             <div class="spinner"></div>
@@ -813,7 +1141,6 @@
           </button>
         </form>
 
-        <!-- SIGNUP FORM -->
         <form id="form-signup" class="auth-form" onsubmit="handleSignup(event)">
           <div id="signup-error" class="auth-error">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -825,21 +1152,15 @@
           </div>
           <div class="auth-input-group">
             <input type="email" id="signup-email" class="auth-input" placeholder="Correo electrónico" required autocomplete="email">
-            <span class="auth-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            </span>
+            <span class="auth-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
           </div>
           <div class="auth-input-group">
             <input type="password" id="signup-password" class="auth-input" placeholder="Contraseña (mín. 6 caracteres)" required minlength="6" autocomplete="new-password">
-            <span class="auth-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            </span>
+            <span class="auth-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
           </div>
           <div class="auth-input-group">
             <input type="password" id="signup-password-confirm" class="auth-input" placeholder="Confirmar contraseña" required minlength="6" autocomplete="new-password">
-            <span class="auth-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </span>
+            <span class="auth-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
           </div>
           <button type="submit" class="auth-btn" id="btn-signup">
             <div class="spinner"></div>
@@ -862,7 +1183,7 @@
           <div class="live-dot"></div>
           <span id="badge-count">0 citas</span>
         </div>
-        <button class="btn-logout" id="btn-logout" onclick="handleLogout()" title="Cerrar sesión">
+        <button class="btn-icon-header btn-logout" id="btn-logout" onclick="handleLogout()" title="Cerrar sesión" aria-label="Cerrar sesión">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
             <polyline points="16 17 21 12 16 7"/>
@@ -872,29 +1193,44 @@
       </div>
     </header>
 
+    <div id="offline-banner" class="offline-banner">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+      Sin conexión — Modo offline
+    </div>
+
     <div class="user-info-bar" id="user-info-bar">
       <div class="user-dot"></div>
       <span class="user-email" id="user-email-display">usuario@email.com</span>
     </div>
 
-    <div class="content-area">
+    <div class="content-area" id="content-area">
+      <!-- PULL TO REFRESH -->
+      <div id="ptr-indicator" class="ptr-container">
+        <div class="ptr-spinner"></div>
+        <span id="ptr-text">Deslizá para actualizar...</span>
+      </div>
+
       <!-- DASHBOARD -->
       <div id="view-dashboard" class="view active">
+        <div id="install-banner" class="install-banner">
+          <div class="install-text">📲 <span>Instalá la app</span> en tu pantalla de inicio para acceso rápido</div>
+          <button class="btn-install" id="btn-install" onclick="installPWA()">Instalar</button>
+          <button class="btn-dismiss-install" onclick="dismissInstall()">×</button>
+        </div>
         <div id="migration-banner-container"></div>
+        <div id="next-appt-banner" class="next-appt-banner">
+          <div class="next-appt-icon">⏰</div>
+          <div class="next-appt-info">
+            <div class="next-appt-label">Próxima cita</div>
+            <div class="next-appt-detail" id="next-appt-detail"></div>
+          </div>
+          <div class="next-appt-countdown" id="next-appt-countdown"></div>
+        </div>
         <div id="reminder-banner-container"></div>
-        <div class="stats-row">
-          <div class="stat-card">
-            <div class="stat-number clr-teal" id="stat-confirmed">0</div>
-            <div class="stat-label">Confirmadas</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number clr-amber" id="stat-pending">0</div>
-            <div class="stat-label">Pendientes</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number clr-rose" id="stat-canceled">0</div>
-            <div class="stat-label">Canceladas</div>
-          </div>
+        <div class="stats-row" id="stats-row">
+          <div class="stat-card"><div class="stat-number clr-teal" id="stat-confirmed">0</div><div class="stat-label">Confirmadas</div></div>
+          <div class="stat-card"><div class="stat-number clr-amber" id="stat-pending">0</div><div class="stat-label">Pendientes</div></div>
+          <div class="stat-card"><div class="stat-number clr-rose" id="stat-canceled">0</div><div class="stat-label">Canceladas</div></div>
         </div>
         <div class="section-header">
           <span class="section-title">Semana</span>
@@ -906,6 +1242,17 @@
           <span class="section-subtitle" id="selected-date-label"></span>
         </div>
         <div class="appt-list" id="appt-list"></div>
+
+        <!-- Floating Voice Magic Button -->
+        <button class="fab-voice" id="fab-voice" onclick="openVoiceMagic()" aria-label="Hablar con IA">
+          <div class="fab-voice-pulse"></div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+          </svg>
+          <span>Dictar con IA</span>
+        </button>
       </div>
 
       <!-- NUEVA CITA -->
@@ -914,9 +1261,28 @@
           <span class="section-title">Nueva Cita</span>
           <span class="section-subtitle">Completá los datos del cliente</span>
         </div>
+
+        <!-- Voice Magic Card -->
+        <div class="voice-magic-card" onclick="openVoiceMagic()">
+          <div class="vmc-left">
+            <div class="vmc-icon">🎙️</div>
+            <div class="vmc-text">
+              <div class="vmc-title">Dictar Cita con IA ✨</div>
+              <div class="vmc-sub">"Corte para Juan mañana a las 4 de la tarde"</div>
+            </div>
+          </div>
+          <button class="btn-vmc-action" type="button">Hablar ✨</button>
+        </div>
+
         <div class="form-card">
           <div class="form-group">
-            <div class="form-label"><span>Nombre del Cliente</span></div>
+            <div class="form-label" style="display:flex;justify-content:space-between;align-items:center;">
+              <span>Nombre del Cliente</span>
+              <button type="button" class="btn-contact-pick" onclick="pickNativeContact()" title="Elegir de los contactos del teléfono">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                <span>📱 Agenda</span>
+              </button>
+            </div>
             <div class="input-wrap">
               <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
               <input type="text" id="inp-name" class="form-input" placeholder="Nombre completo" autocomplete="off" oninput="onNameInput(this.value)">
@@ -932,13 +1298,18 @@
             <div class="chips-wrap" id="service-chips"></div>
           </div>
           <div class="form-group">
-            <div class="form-label">
+            <div class="form-label" style="display:flex;justify-content:space-between;align-items:center;">
               <span>Teléfono</span>
-              <span id="wa-pill" class="wa-pill"></span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <button type="button" class="btn-contact-pick" onclick="saveCurrentFormContactVCF()" title="Guardar este contacto en el teléfono">
+                  <span>📇 Guardar</span>
+                </button>
+                <span id="wa-pill" class="wa-pill"></span>
+              </div>
             </div>
             <div class="input-wrap">
               <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
-              <input type="tel" id="inp-phone" class="form-input" placeholder="Ej. 8888-1234" oninput="onPhoneInput(this.value)">
+              <input type="tel" id="inp-phone" class="form-input" placeholder="Ej. 8888-1234" inputmode="tel" oninput="onPhoneInput(this.value)">
             </div>
           </div>
           <div class="form-group">
@@ -958,7 +1329,7 @@
               <input type="datetime-local" id="inp-datetime" class="form-input">
             </div>
           </div>
-          <button class="btn-submit" onclick="saveAppointment()">
+          <button class="btn-submit" id="btn-save-appt" onclick="saveAppointment()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             Guardar Cita
           </button>
@@ -1000,27 +1371,48 @@
         <div class="config-section">
           <div class="config-section-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            Recordatorios Automáticos (1 Día Antes)
+            Recordatorios Automáticos
           </div>
           <div class="config-card">
             <div class="toggle-row">
               <div class="toggle-info">
-                <div class="toggle-label">Envío Automático (24h antes)</div>
-                <div class="toggle-desc">El sistema envía WhatsApp y correo automáticamente 1 día antes sin que tengás que abrir WhatsApp. Además procesa respuestas con palabras clave (*SI* / *NO*).</div>
+                <div class="toggle-label">Recordatorio 24h antes al cliente</div>
+                <div class="toggle-desc">Envía WhatsApp y/o correo automáticamente 1 día antes. El cliente responde SI o NO para confirmar/cancelar.</div>
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" id="toggle-reminder" onchange="toggleReminder()">
                 <span class="toggle-slider"></span>
               </label>
             </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-label">Notificación personal</div>
+                <div class="toggle-desc">Recibí una notificación en tu teléfono antes de cada cita para prepararte.</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-push" onchange="togglePush()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div id="push-time-area" style="display:none; padding-top:8px;">
+              <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Tiempo antes de la cita</label>
+              <select class="reminder-time-select" id="reminder-minutes-select" onchange="saveReminderMinutes()">
+                <option value="5">5 minutos antes</option>
+                <option value="10">10 minutos antes</option>
+                <option value="15" selected>15 minutos antes</option>
+                <option value="30">30 minutos antes</option>
+                <option value="60">1 hora antes</option>
+                <option value="120">2 horas antes</option>
+              </select>
+            </div>
             <div id="reminder-template-area" class="reminder-template">
-              <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Mensaje de recordatorio automático</label>
+              <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Mensaje de recordatorio al cliente</label>
               <textarea id="reminder-msg-template" oninput="saveReminderTemplate()">Hola {nombre}, te recordamos tu cita para *{servicio}* mañana a las {hora}.
 
 ¿Confirmás tu asistencia?
 👉 Respondé *SI* para confirmar
 👉 Respondé *NO* para cancelar</textarea>
-              <div class="hint">Variables: {nombre}, {servicio}, {hora}. Si el cliente responde SI o NO, el estado de la cita se actualiza solo.</div>
+              <div class="hint">Variables: {nombre}, {servicio}, {hora}. Si el cliente responde SI o NO, el estado de la cita se actualiza automáticamente.</div>
             </div>
           </div>
         </div>
@@ -1031,7 +1423,7 @@
           </div>
           <div class="config-card">
             <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Los datos se guardan de forma segura en la nube, asociados a tu cuenta.</p>
-            <button class="btn-submit" style="background:linear-gradient(135deg,var(--accent-rose),#D94E6E);color:#fff;box-shadow:0 4px 20px rgba(244,114,182,0.3);" onclick="if(confirm('¿Seguro que deseas borrar TODAS las citas? Esta acción no se puede deshacer.')) { clearAllData(); }">
+            <button class="btn-submit" style="background:linear-gradient(135deg,var(--accent-rose),#D94E6E);color:#fff;box-shadow:0 4px 20px rgba(244,114,182,0.3);" onclick="confirmClearAll()">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               Borrar Todas las Citas
             </button>
@@ -1041,23 +1433,99 @@
     </div>
 
     <nav class="bottom-nav" id="bottom-nav">
-      <button class="nav-btn active" id="nav-agenda" onclick="switchTab('dashboard')">
+      <button class="nav-btn active" id="nav-agenda" onclick="switchTab('dashboard')" aria-label="Agenda">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         <span>Agenda</span>
       </button>
-      <button class="nav-btn" id="nav-create" onclick="switchTab('create')">
+      <button class="nav-btn" id="nav-create" onclick="switchTab('create')" aria-label="Nueva Cita">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
         <span>Nueva Cita</span>
       </button>
-      <button class="nav-btn" id="nav-clients" onclick="switchTab('clients')">
+      <button class="nav-btn" id="nav-clients" onclick="switchTab('clients')" aria-label="Clientes">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span>Clientes</span>
       </button>
-      <button class="nav-btn" id="nav-settings" onclick="switchTab('settings')">
+      <button class="nav-btn" id="nav-settings" onclick="switchTab('settings')" aria-label="Ajustes">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         <span>Ajustes</span>
       </button>
     </nav>
+    <!-- VOICE MAGIC BOTTOM SHEET -->
+    <div id="voice-sheet-backdrop" class="sheet-backdrop" onclick="closeVoiceMagic()"></div>
+    <div id="voice-sheet" class="bottom-sheet" role="dialog" aria-modal="true" aria-label="Asistente de Voz">
+      <div class="sheet-handle-bar" onclick="closeVoiceMagic()"><div class="sheet-handle"></div></div>
+      <div class="sheet-content">
+        <div class="sheet-header">
+          <div class="sheet-title" style="display:flex;align-items:center;gap:8px;">
+            <span>🎙️</span><span>Asistente de Voz IA</span>
+          </div>
+          <button class="btn-sheet-close" onclick="closeVoiceMagic()" aria-label="Cerrar">×</button>
+        </div>
+
+        <div class="voice-visualizer">
+          <div class="voice-orb" id="voice-orb" onclick="toggleVoiceRecording()">
+            <div class="voice-orb-ring ring-1"></div>
+            <div class="voice-orb-ring ring-2"></div>
+            <div class="voice-orb-ring ring-3"></div>
+            <div class="voice-orb-core">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+              </svg>
+            </div>
+          </div>
+          <div class="voice-status-text" id="voice-status-text">Tocá el micrófono para hablar</div>
+          <div class="voice-hint-text" id="voice-hint-text">"Corte para Juan mañana a las 4 de la tarde"</div>
+        </div>
+
+        <div class="voice-transcript-box" id="voice-transcript-box" style="display:none;">
+          <div class="voice-transcript-label">Transcripción:</div>
+          <div class="voice-transcript-text" id="voice-transcript-text"></div>
+        </div>
+
+        <div class="voice-parsed-card" id="voice-parsed-card" style="display:none;">
+          <div class="parsed-row"><span class="parsed-label">👤 Cliente</span><span class="parsed-val" id="vp-name">—</span></div>
+          <div class="parsed-row"><span class="parsed-label">✂️ Servicio</span><span class="parsed-val" id="vp-service">—</span></div>
+          <div class="parsed-row"><span class="parsed-label">📅 Fecha</span><span class="parsed-val" id="vp-date">—</span></div>
+          <div class="parsed-row"><span class="parsed-label">⏰ Hora</span><span class="parsed-val" id="vp-time">—</span></div>
+          <button class="btn-voice-confirm" id="btn-voice-confirm" onclick="applyVoiceAppointment()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Aplicar a Nueva Cita</span>
+          </button>
+        </div>
+
+        <div class="voice-fallback-row">
+          <input type="text" id="inp-voice-text" placeholder="O escribe: Corte para Juan mañana a las 4pm..." onkeypress="if(event.key==='Enter') parseAndPreviewText(this.value)">
+          <button class="btn-voice-parse" type="button" onclick="parseAndPreviewText(document.getElementById('inp-voice-text').value)">Procesar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- APPOINTMENT ACTION BOTTOM SHEET (MOBILE) -->
+    <div id="action-sheet-backdrop" class="sheet-backdrop" onclick="closeActionSheet()"></div>
+    <div id="action-sheet" class="bottom-sheet" role="dialog" aria-modal="true" aria-label="Detalles de Cita">
+      <div class="sheet-handle-bar" onclick="closeActionSheet()"><div class="sheet-handle"></div></div>
+      <div class="sheet-content" id="action-sheet-content">
+        <!-- Populated dynamically with mobile actions -->
+      </div>
+    </div>
+
+    <!-- CLIENT QUICK PICKER BOTTOM SHEET -->
+    <div id="client-picker-backdrop" class="sheet-backdrop" onclick="closeClientPicker()"></div>
+    <div id="client-picker-sheet" class="bottom-sheet" role="dialog" aria-modal="true" aria-label="Seleccionar Cliente">
+      <div class="sheet-handle-bar" onclick="closeClientPicker()"><div class="sheet-handle"></div></div>
+      <div class="sheet-content">
+        <div class="sheet-header">
+          <div class="sheet-title">📱 Seleccionar Cliente</div>
+          <button class="btn-sheet-close" onclick="closeClientPicker()" aria-label="Cerrar">×</button>
+        </div>
+        <div class="search-bar" style="margin-bottom:10px;">
+          <input type="text" id="inp-quick-search" placeholder="Buscar por nombre o teléfono..." oninput="renderQuickClientList(this.value)">
+        </div>
+        <div id="quick-client-list" style="display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;"></div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1073,8 +1541,36 @@
     let cachedClients = [];
     let cachedServices = [];
     let cachedSettings = null;
+    let localReminderTimers = [];
+    let nextApptInterval = null;
+    let deferredInstallPrompt = null;
 
     const DEFAULT_REMINDER_MSG = 'Hola {nombre}, te recordamos tu cita para *{servicio}* mañana a las {hora}.\n\n¿Confirmás tu asistencia?\n👉 Respondé *SI* para confirmar\n👉 Respondé *NO* para cancelar';
+
+    // ═══════════════════════════════════════════
+    // HTML SANITIZATION (XSS protection)
+    // ═══════════════════════════════════════════
+    function esc(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+
+    // ═══════════════════════════════════════════
+    // DATE UTILS (timezone-safe)
+    // ═══════════════════════════════════════════
+    function toLocalDateString(date) {
+      const d = new Date(date);
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    function formatPhone(raw) {
+      const digits = (raw || '').replace(/\D/g, '');
+      if (digits.length === 8) return '506' + digits;
+      if (digits.length > 8 && !digits.startsWith('506')) return '506' + digits;
+      return digits;
+    }
 
     // ═══════════════════════════════════════════
     // AUTH FUNCTIONS
@@ -1084,7 +1580,6 @@
       document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
       document.getElementById('form-login').classList.toggle('active', tab === 'login');
       document.getElementById('form-signup').classList.toggle('active', tab === 'signup');
-      // Clear errors
       document.getElementById('login-error').classList.remove('visible');
       document.getElementById('signup-error').classList.remove('visible');
       document.getElementById('signup-success').classList.remove('visible');
@@ -1094,6 +1589,7 @@
       const el = document.getElementById(`${formType}-error`);
       document.getElementById(`${formType}-error-msg`).textContent = msg;
       el.classList.add('visible');
+      if (navigator.vibrate) navigator.vibrate(100);
     }
 
     function setAuthLoading(btnId, loading) {
@@ -1120,7 +1616,6 @@
         showAuthError('login', msgs[error.message] || error.message);
         return;
       }
-      // Session is automatically stored by Supabase — login successful
     }
 
     async function handleSignup(e) {
@@ -1150,19 +1645,17 @@
         return;
       }
 
-      // Check if email confirmation is required
       if (data.user && !data.session) {
         const successEl = document.getElementById('signup-success');
         document.getElementById('signup-success-msg').textContent = '¡Cuenta creada! Revisá tu correo para confirmar.';
         successEl.classList.add('visible');
       }
-      // If session is returned immediately, auth listener will handle it
     }
 
     async function handleLogout() {
       if (!confirm('¿Seguro que deseas cerrar sesión?')) return;
+      clearLocalReminders();
       await sb.auth.signOut();
-      // Auth state change listener will handle UI
     }
 
     // ═══════════════════════════════════════════
@@ -1190,13 +1683,13 @@
       cachedClients = [];
       cachedServices = [];
       cachedSettings = null;
+      clearLocalReminders();
       document.getElementById('loading-overlay').classList.add('hidden');
       document.getElementById('auth-screen').classList.remove('hidden');
       document.getElementById('app-shell').classList.remove('visible');
       document.getElementById('bottom-nav').classList.remove('visible');
     }
 
-    // Listen for auth state changes
     sb.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         showApp(session.user);
@@ -1205,14 +1698,10 @@
       }
     });
 
-    // Initial session check
     (async function checkSession() {
       const { data: { session } } = await sb.auth.getSession();
-      if (session) {
-        showApp(session.user);
-      } else {
-        showAuth();
-      }
+      if (session) { showApp(session.user); }
+      else { showAuth(); }
     })();
 
     // ═══════════════════════════════════════════
@@ -1220,7 +1709,6 @@
     // ═══════════════════════════════════════════
     async function migrateLocalData() {
       if (localStorage.getItem('agendaia_migrated')) return false;
-
       const localAppts = (() => { try { return JSON.parse(localStorage.getItem('agendaia_appointments')) || []; } catch { return []; } })();
       const localClients = (() => { try { return JSON.parse(localStorage.getItem('agendaia_clients')) || []; } catch { return []; } })();
       const localServices = (() => { try { return JSON.parse(localStorage.getItem('agendaia_services')) || []; } catch { return []; } })();
@@ -1233,57 +1721,25 @@
       let migrated = 0;
       const uid = currentUser.id;
 
-      // Migrate clients
       if (localClients.length > 0) {
-        const clientRows = localClients.map(c => ({
-          user_id: uid,
-          nombre: c.nombre,
-          telefono: c.telefono || null,
-          email: c.email || null,
-        }));
-        const { error } = await sb.from('user_clients').upsert(clientRows, { onConflict: 'user_id,nombre', ignoreDuplicates: true });
-        if (!error) migrated += clientRows.length;
+        const rows = localClients.map(c => ({ user_id: uid, nombre: c.nombre, telefono: c.telefono || null, email: c.email || null }));
+        const { error } = await sb.from('user_clients').upsert(rows, { onConflict: 'user_id,nombre', ignoreDuplicates: true });
+        if (!error) migrated += rows.length;
       }
-
-      // Migrate services
       if (localServices.length > 0) {
-        const svcRows = localServices.map(s => ({
-          user_id: uid,
-          name: s.name,
-          emoji: s.emoji || '⭐',
-        }));
-        const { error } = await sb.from('user_services').upsert(svcRows, { onConflict: 'user_id,name', ignoreDuplicates: true });
-        if (!error) migrated += svcRows.length;
+        const rows = localServices.map(s => ({ user_id: uid, name: s.name, emoji: s.emoji || '⭐' }));
+        const { error } = await sb.from('user_services').upsert(rows, { onConflict: 'user_id,name', ignoreDuplicates: true });
+        if (!error) migrated += rows.length;
       }
-
-      // Migrate appointments
       if (localAppts.length > 0) {
-        const apptRows = localAppts.map(a => ({
-          user_id: uid,
-          nombre: a.nombre,
-          servicio: a.servicio,
-          telefono: a.telefono || null,
-          email: a.email || null,
-          fecha_hora: a.fecha_hora,
-          estado: a.estado || 'pendiente',
-          reminder_sent: false,
-          created_at: a.created_at || new Date().toISOString(),
-          updated_at: a.updated_at || new Date().toISOString(),
+        const rows = localAppts.map(a => ({
+          user_id: uid, nombre: a.nombre, servicio: a.servicio,
+          telefono: a.telefono || null, email: a.email || null,
+          fecha_hora: a.fecha_hora, estado: a.estado || 'pendiente',
+          reminder_sent: false, created_at: a.created_at || new Date().toISOString(),
         }));
-        const { error } = await sb.from('user_appointments').insert(apptRows);
-        if (!error) migrated += apptRows.length;
-      }
-
-      // Migrate settings
-      const reminderEnabled = (() => { try { return JSON.parse(localStorage.getItem('agendaia_reminder_enabled')); } catch { return true; } })();
-      const reminderTemplate = localStorage.getItem('agendaia_reminder_template');
-      if (reminderEnabled !== null || reminderTemplate) {
-        await sb.from('user_settings').upsert({
-          user_id: uid,
-          reminder_enabled: reminderEnabled !== false,
-          reminder_template: reminderTemplate || DEFAULT_REMINDER_MSG,
-          email_reminder_enabled: true,
-        });
+        const { error } = await sb.from('user_appointments').insert(rows);
+        if (!error) migrated += rows.length;
       }
 
       localStorage.setItem('agendaia_migrated', 'true');
@@ -1293,13 +1749,9 @@
     // ═══════════════════════════════════════════
     // SUPABASE DATA FUNCTIONS
     // ═══════════════════════════════════════════
-
-    // --- Appointments ---
     async function fetchAppointments() {
       const { data, error } = await sb.from('user_appointments')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .order('fecha_hora', { ascending: true });
+        .select('*').eq('user_id', currentUser.id).order('fecha_hora', { ascending: true });
       if (error) { console.error('fetchAppointments:', error); return []; }
       cachedAppointments = data || [];
       return cachedAppointments;
@@ -1307,14 +1759,9 @@
 
     async function insertAppointment(appt) {
       const { data, error } = await sb.from('user_appointments').insert({
-        user_id: currentUser.id,
-        nombre: appt.nombre,
-        servicio: appt.servicio,
-        telefono: appt.telefono || null,
-        email: appt.email || null,
-        fecha_hora: appt.fecha_hora,
-        estado: 'pendiente',
-        reminder_sent: false,
+        user_id: currentUser.id, nombre: appt.nombre, servicio: appt.servicio,
+        telefono: appt.telefono || null, email: appt.email || null,
+        fecha_hora: appt.fecha_hora, estado: 'pendiente', reminder_sent: false,
       }).select().single();
       if (error) { console.error('insertAppointment:', error); return null; }
       cachedAppointments.push(data);
@@ -1324,8 +1771,7 @@
     async function updateAppointmentStatus(id, estado) {
       const { error } = await sb.from('user_appointments')
         .update({ estado, updated_at: new Date().toISOString() })
-        .eq('id', id)
-        .eq('user_id', currentUser.id);
+        .eq('id', id).eq('user_id', currentUser.id);
       if (error) { console.error('updateStatus:', error); return false; }
       const idx = cachedAppointments.findIndex(a => a.id === id);
       if (idx >= 0) cachedAppointments[idx].estado = estado;
@@ -1333,20 +1779,15 @@
     }
 
     async function deleteAllAppointments() {
-      const { error } = await sb.from('user_appointments')
-        .delete()
-        .eq('user_id', currentUser.id);
+      const { error } = await sb.from('user_appointments').delete().eq('user_id', currentUser.id);
       if (error) { console.error('deleteAll:', error); return false; }
       cachedAppointments = [];
       return true;
     }
 
-    // --- Clients ---
     async function fetchClients() {
       const { data, error } = await sb.from('user_clients')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .order('nombre', { ascending: true });
+        .select('*').eq('user_id', currentUser.id).order('nombre', { ascending: true });
       if (error) { console.error('fetchClients:', error); return []; }
       cachedClients = data || [];
       return cachedClients;
@@ -1365,18 +1806,12 @@
         return existing;
       }
       const { data, error } = await sb.from('user_clients').insert({
-        user_id: currentUser.id,
-        nombre,
-        telefono: telefono || null,
-        email: email || null,
+        user_id: currentUser.id, nombre, telefono: telefono || null, email: email || null,
       }).select().single();
       if (error) {
         if (error.code === '23505') {
           const { data: fetched } = await sb.from('user_clients')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .ilike('nombre', nombre)
-            .single();
+            .select('*').eq('user_id', currentUser.id).ilike('nombre', nombre).single();
           if (fetched) { cachedClients.push(fetched); return fetched; }
         }
         console.error('upsertClient:', error);
@@ -1386,25 +1821,18 @@
       return data;
     }
 
-    // --- Services ---
     async function fetchServices() {
       const { data, error } = await sb.from('user_services')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .order('created_at', { ascending: true });
+        .select('*').eq('user_id', currentUser.id).order('created_at', { ascending: true });
       if (error) { console.error('fetchServices:', error); return []; }
       cachedServices = data || [];
       return cachedServices;
     }
 
     async function insertService(name, emoji = '⭐') {
-      if (cachedServices.some(s => s.name.toLowerCase() === name.toLowerCase())) {
-        return null; // duplicate
-      }
+      if (cachedServices.some(s => s.name.toLowerCase() === name.toLowerCase())) return null;
       const { data, error } = await sb.from('user_services').insert({
-        user_id: currentUser.id,
-        name,
-        emoji,
+        user_id: currentUser.id, name, emoji,
       }).select().single();
       if (error) { console.error('insertService:', error); return null; }
       cachedServices.push(data);
@@ -1412,23 +1840,20 @@
     }
 
     async function removeService(id) {
-      const { error } = await sb.from('user_services')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', currentUser.id);
+      const { error } = await sb.from('user_services').delete().eq('id', id).eq('user_id', currentUser.id);
       if (error) { console.error('removeService:', error); return false; }
       cachedServices = cachedServices.filter(s => s.id !== id);
       return true;
     }
 
-    // --- Settings ---
     async function fetchSettings() {
       const { data, error } = await sb.from('user_settings')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .single();
+        .select('*').eq('user_id', currentUser.id).single();
       if (error && error.code !== 'PGRST116') { console.error('fetchSettings:', error); }
-      cachedSettings = data || { reminder_enabled: false, reminder_template: DEFAULT_REMINDER_MSG, reminded_ids: [] };
+      cachedSettings = data || {
+        reminder_enabled: false, reminder_template: DEFAULT_REMINDER_MSG,
+        reminded_ids: [], push_enabled: true, reminder_minutes_before: 15,
+      };
       return cachedSettings;
     }
 
@@ -1441,15 +1866,37 @@
     }
 
     // ═══════════════════════════════════════════
-    // TOAST
+    // TOAST & CONFETTI
     // ═══════════════════════════════════════════
     function showToast(msg, isError = false) {
       const c = document.getElementById('toast-container');
       const t = document.createElement('div');
       t.className = 'toast' + (isError ? ' error' : '');
-      t.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${isError ? '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>' : '<polyline points="20 6 9 17 4 12"/>'}</svg><span>${msg}</span>`;
+      const icon = isError
+        ? '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'
+        : '<polyline points="20 6 9 17 4 12"/>';
+      t.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${icon}</svg><span>${esc(msg)}</span>`;
       c.appendChild(t);
-      setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(-10px)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, 3500);
+      if (!isError && navigator.vibrate) navigator.vibrate(50);
+      setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(-10px)'; t.style.transition = 'all 0.3s'; setTimeout(() => t.remove(), 300); }, 3500);
+    }
+
+    function launchConfetti() {
+      const container = document.getElementById('confetti-container');
+      const colors = ['#D4A853', '#4ECDC4', '#F59E0B', '#C084FC', '#F472B6', '#25D366'];
+      for (let i = 0; i < 50; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 0.5 + 's';
+        piece.style.animationDuration = (2 + Math.random()) + 's';
+        piece.style.width = (6 + Math.random() * 8) + 'px';
+        piece.style.height = (6 + Math.random() * 8) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        container.appendChild(piece);
+      }
+      setTimeout(() => { container.innerHTML = ''; }, 3000);
     }
 
     // ═══════════════════════════════════════════
@@ -1462,8 +1909,10 @@
       document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
       document.getElementById(`view-${tab}`).classList.add('active');
       document.getElementById(`nav-${tab === 'dashboard' ? 'agenda' : tab}`).classList.add('active');
-      const titles = { dashboard:'Agenda de Hoy', create:'Nueva Cita', clients:'Mis Clientes', settings:'Ajustes' };
+      const titles = { dashboard: 'Agenda de Hoy', create: 'Nueva Cita', clients: 'Mis Clientes', settings: 'Ajustes' };
       document.getElementById('header-title').textContent = titles[tab] || '';
+      if (navigator.vibrate) navigator.vibrate(30);
+      SoundEngine.tap();
       if (tab === 'dashboard') renderDashboard();
       if (tab === 'create') renderServiceChips();
       if (tab === 'clients') renderClients();
@@ -1471,7 +1920,7 @@
     }
 
     // ═══════════════════════════════════════════
-    // GREETING
+    // GREETING & CLOCK
     // ═══════════════════════════════════════════
     function updateGreeting() {
       const h = new Date().getHours();
@@ -1484,18 +1933,20 @@
     // ═══════════════════════════════════════════
     // DATE NAV
     // ═══════════════════════════════════════════
-    let selectedDate = new Date(); selectedDate.setHours(0,0,0,0);
-    const DAYS_ES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    let selectedDate = new Date(); selectedDate.setHours(0, 0, 0, 0);
+    const DAYS_ES = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const MONTHS_ES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
     function renderDateChips() {
       const c = document.getElementById('date-chips'); c.innerHTML = '';
-      const today = new Date(); today.setHours(0,0,0,0);
+      const today = new Date(); today.setHours(0, 0, 0, 0);
       document.getElementById('month-label').textContent = MONTHS_ES[today.getMonth()] + ' ' + today.getFullYear();
       for (let i = -1; i < 7; i++) {
         const d = new Date(today); d.setDate(d.getDate() + i);
+        const dateStr = toLocalDateString(d);
+        const hasAppts = cachedAppointments.some(a => toLocalDateString(a.fecha_hora) === dateStr);
         const chip = document.createElement('div');
-        chip.className = 'date-chip' + (d.getTime() === selectedDate.getTime() ? ' active' : '');
+        chip.className = 'date-chip' + (d.getTime() === selectedDate.getTime() ? ' active' : '') + (hasAppts ? ' has-appts' : '');
         chip.innerHTML = `<span class="day-name">${DAYS_ES[d.getDay()]}</span><span class="day-num">${d.getDate()}</span>`;
         chip.onclick = () => { selectedDate = new Date(d); renderDateChips(); renderAppointments(); };
         c.appendChild(chip);
@@ -1505,31 +1956,26 @@
     // ═══════════════════════════════════════════
     // DASHBOARD
     // ═══════════════════════════════════════════
-    async function renderDashboard() { renderDateChips(); await renderAppointments(); checkReminders(); }
+    async function renderDashboard() { renderDateChips(); await renderAppointments(); checkReminders(); updateNextAppointment(); }
 
     async function renderAppointments() {
       const container = document.getElementById('appt-list');
-      // Use cached data — already fetched
       const all = cachedAppointments;
-      const dateStr = selectedDate.toISOString().split('T')[0];
-      const day = all.filter(a => {
-        const aDate = new Date(a.fecha_hora);
-        const aStr = aDate.getFullYear() + '-' + String(aDate.getMonth()+1).padStart(2,'0') + '-' + String(aDate.getDate()).padStart(2,'0');
-        return aStr === dateStr;
-      });
-      day.sort((a,b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
+      const dateStr = toLocalDateString(selectedDate);
+      const day = all.filter(a => toLocalDateString(a.fecha_hora) === dateStr);
+      day.sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
 
-      const conf = day.filter(a=>a.estado==='confirmado').length;
-      const pend = day.filter(a=>a.estado==='pendiente').length;
-      const canc = day.filter(a=>a.estado==='cancelado').length;
+      const conf = day.filter(a => a.estado === 'confirmado').length;
+      const pend = day.filter(a => a.estado === 'pendiente').length;
+      const canc = day.filter(a => a.estado === 'cancelado').length;
       document.getElementById('stat-confirmed').textContent = conf;
       document.getElementById('stat-pending').textContent = pend;
       document.getElementById('stat-canceled').textContent = canc;
-      document.getElementById('badge-count').textContent = `${day.length} cita${day.length!==1?'s':''}`;
+      document.getElementById('badge-count').textContent = `${day.length} cita${day.length !== 1 ? 's' : ''}`;
 
-      const today = new Date(); today.setHours(0,0,0,0);
-      let dateLabel = selectedDate.getDate()+' de '+MONTHS_ES[selectedDate.getMonth()];
-      if (selectedDate.getTime()===today.getTime()) dateLabel = 'Hoy, '+dateLabel;
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      let dateLabel = selectedDate.getDate() + ' de ' + MONTHS_ES[selectedDate.getMonth()];
+      if (selectedDate.getTime() === today.getTime()) dateLabel = 'Hoy, ' + dateLabel;
       document.getElementById('selected-date-label').textContent = dateLabel;
 
       if (day.length === 0) {
@@ -1539,27 +1985,29 @@
 
       container.innerHTML = day.map(appt => {
         const dt = new Date(appt.fecha_hora);
-        let h = dt.getHours(); const m = String(dt.getMinutes()).padStart(2,'0');
-        const p = h >= 12 ? 'PM' : 'AM'; if(h>12) h-=12; if(h===0) h=12;
-        const sl = appt.estado.charAt(0).toUpperCase()+appt.estado.slice(1);
-        let ph = (appt.telefono||'').replace(/\D/g,'');
-        if(ph.length===8) ph='506'+ph; else if(!ph.startsWith('506')&&ph.length>8) ph='506'+ph;
+        let h = dt.getHours(); const m = String(dt.getMinutes()).padStart(2, '0');
+        const p = h >= 12 ? 'PM' : 'AM'; if (h > 12) h -= 12; if (h === 0) h = 12;
+        const sl = appt.estado.charAt(0).toUpperCase() + appt.estado.slice(1);
+        const ph = formatPhone(appt.telefono);
         const wm = encodeURIComponent(`Hola ${appt.nombre}, te recordamos tu cita para *${appt.servicio}* el ${dateLabel} a las ${h}:${m} ${p}.\n\n¿Confirmás tu asistencia?\n👉 Respondé *SI* para confirmar\n👉 Respondé *NO* para cancelar`);
-        return `<div class="appt-card status-${appt.estado}">
+        const nameEsc = esc(appt.nombre);
+        const svcEsc = esc(appt.servicio);
+        const emailEsc = esc(appt.email);
+        return `<div class="appt-card status-${appt.estado}" onclick="openActionSheet('${appt.id}')">
           <div class="appt-time-block"><span class="time-h">${h}:${m}</span><span class="time-p">${p}</span></div>
           <div class="appt-details">
-            <div class="appt-name">${appt.nombre}</div>
-            <div class="appt-service">${appt.servicio}</div>
-            ${appt.email ? `<div class="appt-email"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>${appt.email}</div>` : ''}
-            <div style="display:flex; flex-wrap:wrap; gap:4px; align-items:center; margin-top:4px;">
+            <div class="appt-name">${nameEsc}</div>
+            <div class="appt-service">${svcEsc}</div>
+            ${appt.email ? `<div class="appt-email"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>${emailEsc}</div>` : ''}
+            <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:4px;">
               <span class="appt-status-badge badge-${appt.estado}">● ${sl}</span>
-              ${appt.reminder_sent ? `<span class="appt-reminder-status" title="Recordatorio automático 24h enviado">🔔 24h Enviado</span>` : ''}
-              ${appt.reminder_response ? `<span class="appt-response-badge" title="Respuesta del cliente">💬 ${appt.reminder_response}</span>` : ''}
+              ${appt.reminder_sent ? '<span class="appt-reminder-status" title="Recordatorio automático 24h enviado">🔔 24h Enviado</span>' : ''}
+              ${appt.reminder_response ? `<span class="appt-response-badge" title="Respuesta del cliente">💬 ${esc(appt.reminder_response)}</span>` : ''}
             </div>
           </div>
-          <div class="appt-actions">
-            ${appt.telefono ? `<a href="https://wa.me/${ph}?text=${wm}" target="_blank" rel="noopener" class="btn-wa" title="WhatsApp"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>` : ''}
-            ${appt.email ? `<a href="mailto:${appt.email}?subject=${encodeURIComponent('Recordatorio de Cita - ' + appt.servicio)}&body=${wm}" class="btn-mail" title="Enviar Correo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>` : ''}
+          <div class="appt-actions" onclick="event.stopPropagation()">
+            ${appt.telefono ? `<a href="whatsapp://send?phone=${ph}&text=${wm}" class="btn-wa" title="WhatsApp" onclick="event.stopPropagation()"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>` : ''}
+            ${appt.email ? `<a href="mailto:${emailEsc}?subject=${encodeURIComponent('Recordatorio de Cita - ' + appt.servicio)}&body=${wm}" class="btn-mail" title="Enviar Correo" onclick="event.stopPropagation()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>` : ''}
             <div class="btn-status-toggle" onclick="toggleStatusDropdown('${appt.id}',event)" title="Cambiar estado">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
               <div class="status-dropdown" id="dropdown-${appt.id}">
@@ -1577,7 +2025,7 @@
       e.stopPropagation(); e.preventDefault();
       const dd = document.getElementById(`dropdown-${id}`);
       if (!dd) return;
-      document.querySelectorAll('.status-dropdown').forEach(d => { if(d.id!==`dropdown-${id}`) d.classList.remove('open'); });
+      document.querySelectorAll('.status-dropdown').forEach(d => { if (d.id !== `dropdown-${id}`) d.classList.remove('open'); });
       dd.classList.toggle('open');
     }
 
@@ -1586,32 +2034,175 @@
       const ok = await updateAppointmentStatus(id, s);
       if (ok) {
         renderAppointments();
-        showToast(`Estado: ${s.charAt(0).toUpperCase()+s.slice(1)}`);
+        showToast(`Estado: ${s.charAt(0).toUpperCase() + s.slice(1)}`);
       } else {
         showToast('Error al cambiar estado', true);
       }
-      document.querySelectorAll('.status-dropdown').forEach(d=>d.classList.remove('open'));
+      document.querySelectorAll('.status-dropdown').forEach(d => d.classList.remove('open'));
     }
-    document.addEventListener('click', e => { if(!e.target.closest('.btn-status-toggle')) document.querySelectorAll('.status-dropdown').forEach(d=>d.classList.remove('open')); });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.btn-status-toggle'))
+        document.querySelectorAll('.status-dropdown').forEach(d => d.classList.remove('open'));
+    });
 
     // ═══════════════════════════════════════════
-    // REMINDERS
+    // NEXT APPOINTMENT COUNTDOWN
+    // ═══════════════════════════════════════════
+    function updateNextAppointment() {
+      const banner = document.getElementById('next-appt-banner');
+      const now = new Date();
+      const upcoming = cachedAppointments
+        .filter(a => new Date(a.fecha_hora) > now && a.estado !== 'cancelado')
+        .sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
+
+      if (upcoming.length === 0) { banner.classList.remove('visible'); return; }
+
+      const next = upcoming[0];
+      const dt = new Date(next.fecha_hora);
+      const diffMs = dt - now;
+      const diffMin = Math.floor(diffMs / 60000);
+      const diffH = Math.floor(diffMin / 60);
+      const remMin = diffMin % 60;
+
+      let countdown = '';
+      if (diffH > 0) countdown = `${diffH}h ${remMin}m`;
+      else countdown = `${remMin}m`;
+
+      let h = dt.getHours(); const m = String(dt.getMinutes()).padStart(2, '0');
+      const p = h >= 12 ? 'PM' : 'AM'; if (h > 12) h -= 12; if (h === 0) h = 12;
+
+      document.getElementById('next-appt-detail').textContent = `${esc(next.nombre)} — ${esc(next.servicio)} a las ${h}:${m} ${p}`;
+      document.getElementById('next-appt-countdown').textContent = `En ${countdown}`;
+      banner.classList.add('visible');
+    }
+
+    // ═══════════════════════════════════════════
+    // LOCAL PUSH NOTIFICATIONS (15 min before)
+    // ═══════════════════════════════════════════
+    function clearLocalReminders() {
+      localReminderTimers.forEach(t => clearTimeout(t));
+      localReminderTimers = [];
+      if (nextApptInterval) { clearInterval(nextApptInterval); nextApptInterval = null; }
+    }
+
+    function scheduleLocalReminders() {
+      clearLocalReminders();
+      if (!cachedSettings || !cachedSettings.push_enabled) return;
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+      const minsBefore = cachedSettings.reminder_minutes_before || 15;
+      const now = new Date();
+
+      cachedAppointments.forEach(appt => {
+        if (appt.estado === 'cancelado') return;
+        const dt = new Date(appt.fecha_hora);
+        const notifyAt = new Date(dt.getTime() - minsBefore * 60 * 1000);
+        const msUntil = notifyAt - now;
+
+        if (msUntil > 0 && msUntil < 24 * 60 * 60 * 1000) {
+          const timerId = setTimeout(() => {
+            let h = dt.getHours(); const m = String(dt.getMinutes()).padStart(2, '0');
+            const p = h >= 12 ? 'PM' : 'AM'; if (h > 12) h -= 12; if (h === 0) h = 12;
+
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+              navigator.serviceWorker.ready.then(reg => {
+                reg.showNotification('⏰ Cita en ' + minsBefore + ' minutos', {
+                  body: `${appt.nombre} — ${appt.servicio} a las ${h}:${m} ${p}`,
+                  icon: 'icon-192.svg',
+                  badge: 'icon-192.svg',
+                  vibrate: [200, 100, 200],
+                  tag: 'local-reminder-' + appt.id,
+                  requireInteraction: true,
+                });
+              });
+            } else {
+              new Notification('⏰ Cita en ' + minsBefore + ' minutos', {
+                body: `${appt.nombre} — ${appt.servicio} a las ${h}:${m} ${p}`,
+                icon: 'icon-192.svg',
+              });
+            }
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+          }, msUntil);
+          localReminderTimers.push(timerId);
+        }
+      });
+
+      // Update countdown every minute
+      nextApptInterval = setInterval(updateNextAppointment, 60000);
+    }
+
+    // ═══════════════════════════════════════════
+    // SERVICE WORKER & PWA
+    // ═══════════════════════════════════════════
+    async function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      try {
+        const registration = await navigator.serviceWorker.register('/sw.js');
+        console.log('[SW] Registered:', registration.scope);
+      } catch (err) {
+        console.warn('[SW] Registration failed:', err);
+      }
+    }
+
+    async function requestNotificationPermission() {
+      if (!('Notification' in window)) return false;
+      if (Notification.permission === 'granted') return true;
+      if (Notification.permission === 'denied') return false;
+      const result = await Notification.requestPermission();
+      return result === 'granted';
+    }
+
+    // PWA Install Prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (!localStorage.getItem('install_dismissed')) {
+        document.getElementById('install-banner').classList.add('visible');
+      }
+    });
+
+    async function installPWA() {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      if (outcome === 'accepted') {
+        showToast('¡App instalada! 🎉');
+        document.getElementById('install-banner').classList.remove('visible');
+      }
+      deferredInstallPrompt = null;
+    }
+
+    function dismissInstall() {
+      document.getElementById('install-banner').classList.remove('visible');
+      localStorage.setItem('install_dismissed', 'true');
+    }
+
+    // Offline detection
+    function updateOnlineStatus() {
+      document.getElementById('offline-banner').classList.toggle('visible', !navigator.onLine);
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    // ═══════════════════════════════════════════
+    // REMINDERS (24h banner)
     // ═══════════════════════════════════════════
     function checkReminders() {
       const bc = document.getElementById('reminder-banner-container'); bc.innerHTML = '';
       if (!cachedSettings || !cachedSettings.reminder_enabled) return;
       const all = cachedAppointments; const now = new Date();
-      const tmrw = new Date(now.getTime()+24*60*60*1000);
+      const tmrw = new Date(now.getTime() + 24 * 60 * 60 * 1000);
       const reminded = cachedSettings.reminded_ids || [];
-      const upcoming = all.filter(a => { const d=new Date(a.fecha_hora); return d>now&&d<=tmrw&&a.estado==='pendiente'&&!reminded.includes(a.id); });
-      if (upcoming.length===0) return;
+      const upcoming = all.filter(a => { const d = new Date(a.fecha_hora); return d > now && d <= tmrw && a.estado === 'pendiente' && !reminded.includes(a.id); });
+      if (upcoming.length === 0) return;
       const tpl = cachedSettings.reminder_template || DEFAULT_REMINDER_MSG;
       const items = upcoming.map(a => {
-        const dt=new Date(a.fecha_hora); let h=dt.getHours(); const m=String(dt.getMinutes()).padStart(2,'0');
-        const p=h>=12?'PM':'AM'; if(h>12)h-=12; if(h===0)h=12; const ts=`${h}:${m} ${p}`;
-        let ph=(a.telefono||'').replace(/\D/g,''); if(ph.length===8)ph='506'+ph; else if(!ph.startsWith('506')&&ph.length>8)ph='506'+ph;
-        const msg=tpl.replace('{nombre}',a.nombre).replace('{servicio}',a.servicio).replace('{hora}',ts);
-        return `<div class="rb-item"><span>${a.nombre} — ${ts}</span><a href="https://wa.me/${ph}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" onclick="markReminded('${a.id}')">📱 Enviar</a></div>`;
+        const dt = new Date(a.fecha_hora); let h = dt.getHours(); const m = String(dt.getMinutes()).padStart(2, '0');
+        const p = h >= 12 ? 'PM' : 'AM'; if (h > 12) h -= 12; if (h === 0) h = 12; const ts = `${h}:${m} ${p}`;
+        const ph = formatPhone(a.telefono);
+        const msg = tpl.replace(/{nombre}/g, a.nombre).replace(/{servicio}/g, a.servicio).replace(/{hora}/g, ts);
+        return `<div class="rb-item"><span>${esc(a.nombre)} — ${ts}</span><a href="https://wa.me/${ph}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" onclick="markReminded('${a.id}')">📱 Enviar</a></div>`;
       }).join('');
       bc.innerHTML = `<div class="reminder-banner"><div class="rb-title">🔔 Recordatorios pendientes (${upcoming.length})</div>${items}</div>`;
     }
@@ -1622,13 +2213,35 @@
         ids.push(id);
         await saveSettings({ user_id: currentUser.id, reminded_ids: ids });
       }
-      setTimeout(()=>checkReminders(), 500);
+      setTimeout(() => checkReminders(), 500);
     }
 
     async function toggleReminder() {
       const en = document.getElementById('toggle-reminder').checked;
       await saveSettings({ user_id: currentUser.id, reminder_enabled: en });
       document.getElementById('reminder-template-area').classList.toggle('visible', en);
+    }
+
+    async function togglePush() {
+      const en = document.getElementById('toggle-push').checked;
+      if (en) {
+        const granted = await requestNotificationPermission();
+        if (!granted) {
+          document.getElementById('toggle-push').checked = false;
+          showToast('Permisos de notificación denegados. Activalos en la configuración del navegador.', true);
+          return;
+        }
+      }
+      await saveSettings({ user_id: currentUser.id, push_enabled: en });
+      document.getElementById('push-time-area').style.display = en ? 'block' : 'none';
+      if (en) scheduleLocalReminders();
+      else clearLocalReminders();
+    }
+
+    async function saveReminderMinutes() {
+      const mins = parseInt(document.getElementById('reminder-minutes-select').value);
+      await saveSettings({ user_id: currentUser.id, reminder_minutes_before: mins });
+      scheduleLocalReminders();
     }
 
     let templateDebounce;
@@ -1643,118 +2256,151 @@
     // SERVICE CHIPS
     // ═══════════════════════════════════════════
     function renderServiceChips() {
-      const c=document.getElementById('service-chips');
-      if(cachedServices.length===0){c.innerHTML='<span class="no-services-msg">No hay servicios. Agregalos en Ajustes.</span>';return;}
-      c.innerHTML=cachedServices.map(x=>`<span class="service-chip" onclick="selectService(this,'${x.name.replace(/'/g,"\\'")}')">${x.emoji} ${x.name}</span>`).join('');
+      const c = document.getElementById('service-chips');
+      if (cachedServices.length === 0) { c.innerHTML = '<span class="no-services-msg">No hay servicios. Agregalos en Ajustes.</span>'; return; }
+      c.innerHTML = cachedServices.map(x => `<span class="service-chip" onclick="selectService(this,'${esc(x.name).replace(/'/g, "\\'")}')">${esc(x.emoji)} ${esc(x.name)}</span>`).join('');
     }
-    function selectService(el,n){document.getElementById('inp-service').value=n;document.querySelectorAll('.service-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+
+    function selectService(el, n) {
+      document.getElementById('inp-service').value = n;
+      document.querySelectorAll('.service-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      if (navigator.vibrate) navigator.vibrate(20);
+    }
 
     // ═══════════════════════════════════════════
     // CLIENT AUTOCOMPLETE
     // ═══════════════════════════════════════════
     function onNameInput(v) {
-      const b=document.getElementById('ac-box');
-      if(v.length<2){b.classList.remove('open');return;}
-      const cl=cachedClients.filter(c=>c.nombre.toLowerCase().includes(v.toLowerCase()));
-      if(!cl.length){b.classList.remove('open');return;}
-      b.innerHTML=cl.map(c=>`<div class="ac-item" onclick="selectClient('${c.nombre.replace(/'/g,"\\'")}','${c.telefono||''}','${c.email||''}')"><div><span class="ac-name">${c.nombre}</span><span class="ac-phone">📱 ${c.telefono||'Sin teléfono'}</span>${c.email?`<span class="ac-email" style="font-size:11px;color:var(--text-muted);margin-left:6px;">✉️ ${c.email}</span>`:''}</div></div>`).join('');
+      const b = document.getElementById('ac-box');
+      if (v.length < 2) { b.classList.remove('open'); return; }
+      const cl = cachedClients.filter(c => c.nombre.toLowerCase().includes(v.toLowerCase()));
+      if (!cl.length) { b.classList.remove('open'); return; }
+      b.innerHTML = cl.map(c =>
+        `<div class="ac-item" onclick="selectClient('${esc(c.nombre).replace(/'/g, "\\'")}','${esc(c.telefono || '')}','${esc(c.email || '')}')">` +
+        `<div><span class="ac-name">${esc(c.nombre)}</span><span class="ac-phone">📱 ${esc(c.telefono || 'Sin teléfono')}</span>` +
+        `${c.email ? `<span style="font-size:11px;color:var(--text-muted);margin-left:6px;">✉️ ${esc(c.email)}</span>` : ''}</div></div>`
+      ).join('');
       b.classList.add('open');
     }
-    function selectClient(n,p,em){
-      document.getElementById('inp-name').value=n;
-      if(p){document.getElementById('inp-phone').value=p;onPhoneInput(p);}
-      if(em){document.getElementById('inp-email').value=em;}
+
+    function selectClient(n, p, em) {
+      document.getElementById('inp-name').value = n;
+      if (p) { document.getElementById('inp-phone').value = p; onPhoneInput(p); }
+      if (em) { document.getElementById('inp-email').value = em; }
       document.getElementById('ac-box').classList.remove('open');
     }
 
     // ═══════════════════════════════════════════
-    // PHONE
+    // PHONE VALIDATION
     // ═══════════════════════════════════════════
     let phoneDebounce;
     function onPhoneInput(v) {
-      clearTimeout(phoneDebounce); const pill=document.getElementById('wa-pill'); const cl=v.replace(/\D/g,'');
-      if(cl.length<8){pill.className='wa-pill';pill.style.display='none';return;}
-      pill.className='wa-pill checking';pill.textContent='⏳ Verificando...';pill.style.display='inline-flex';
-      phoneDebounce=setTimeout(()=>{pill.className='wa-pill valid';pill.textContent='✅ WhatsApp Activo';},600);
+      clearTimeout(phoneDebounce);
+      const pill = document.getElementById('wa-pill');
+      const cl = v.replace(/\D/g, '');
+      if (cl.length < 8) { pill.className = 'wa-pill'; pill.style.display = 'none'; return; }
+      pill.className = 'wa-pill checking'; pill.textContent = '⏳ Verificando...'; pill.style.display = 'inline-flex';
+      phoneDebounce = setTimeout(() => { pill.className = 'wa-pill valid'; pill.textContent = '✅ WhatsApp Activo'; }, 600);
     }
 
     // ═══════════════════════════════════════════
     // SAVE APPOINTMENT
     // ═══════════════════════════════════════════
     async function saveAppointment() {
-      const name=document.getElementById('inp-name').value.trim();
-      const svc=document.getElementById('inp-service').value.trim();
-      const phone=document.getElementById('inp-phone').value.trim();
-      const email=document.getElementById('inp-email')?.value.trim() || '';
-      const dt=document.getElementById('inp-datetime').value;
-      if(!name){showToast('Ingresá el nombre del cliente',true);return;}
-      if(!svc){showToast('Seleccioná o escribí un servicio',true);return;}
-      if(!dt){showToast('Seleccioná fecha y hora',true);return;}
+      const btn = document.getElementById('btn-save-appt');
+      const name = document.getElementById('inp-name').value.trim();
+      const svc = document.getElementById('inp-service').value.trim();
+      const phone = document.getElementById('inp-phone').value.trim();
+      const email = document.getElementById('inp-email').value.trim();
+      const dt = document.getElementById('inp-datetime').value;
+
+      if (!name) { showToast('Ingresá el nombre del cliente', true); return; }
+      if (!svc) { showToast('Seleccioná o escribí un servicio', true); return; }
+      if (!dt) { showToast('Seleccioná fecha y hora', true); return; }
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('El correo electrónico no es válido', true); return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner" style="display:block;width:18px;height:18px;border:2.5px solid rgba(12,10,9,0.3);border-top-color:#0C0A09;border-radius:50%;animation:spin 0.6s linear infinite;"></div> Guardando...';
 
       const appt = await insertAppointment({
-        nombre: name,
-        servicio: svc,
-        telefono: phone,
-        email: email || null,
-        fecha_hora: new Date(dt).toISOString(),
+        nombre: name, servicio: svc, telefono: phone,
+        email: email || null, fecha_hora: new Date(dt).toISOString(),
       });
 
-      if (!appt) {
-        showToast('Error al guardar la cita', true);
-        return;
-      }
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Guardar Cita';
 
-      // Upsert client
+      if (!appt) { showToast('Error al guardar la cita', true); return; }
+
       await upsertClient(name, phone, email || null);
 
-      document.getElementById('inp-name').value='';document.getElementById('inp-service').value='';
-      document.getElementById('inp-phone').value='';if(document.getElementById('inp-email')) document.getElementById('inp-email').value='';
-      document.getElementById('wa-pill').style.display='none';
-      document.querySelectorAll('.service-chip').forEach(c=>c.classList.remove('active'));
+      document.getElementById('inp-name').value = '';
+      document.getElementById('inp-service').value = '';
+      document.getElementById('inp-phone').value = '';
+      document.getElementById('inp-email').value = '';
+      document.getElementById('wa-pill').style.display = 'none';
+      document.querySelectorAll('.service-chip').forEach(c => c.classList.remove('active'));
       setDefaultDateTime();
+
+      launchConfetti();
       showToast('¡Cita guardada exitosamente! ✨');
-      setTimeout(()=>{selectedDate=new Date(dt);selectedDate.setHours(0,0,0,0);switchTab('dashboard');},1200);
+      if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+
+      scheduleLocalReminders();
+
+      setTimeout(() => {
+        selectedDate = new Date(dt); selectedDate.setHours(0, 0, 0, 0);
+        switchTab('dashboard');
+      }, 1200);
     }
-    function setDefaultDateTime(){const n=new Date();n.setMinutes(0,0,0);n.setHours(n.getHours()+1);const o=n.getTimezoneOffset()*60000;document.getElementById('inp-datetime').value=new Date(n.getTime()-o).toISOString().slice(0,16);}
+
+    function setDefaultDateTime() {
+      const n = new Date();
+      n.setMinutes(0, 0, 0);
+      n.setHours(n.getHours() + 1);
+      const o = n.getTimezoneOffset() * 60000;
+      document.getElementById('inp-datetime').value = new Date(n.getTime() - o).toISOString().slice(0, 16);
+    }
 
     // ═══════════════════════════════════════════
     // CLIENTS VIEW
     // ═══════════════════════════════════════════
-    function renderClients(query='') {
+    function renderClients(query = '') {
       const cl = cachedClients;
-      const q = (query||document.getElementById('inp-search-client')?.value||'').toLowerCase();
-      const filtered = q ? cl.filter(c=>c.nombre.toLowerCase().includes(q)||(c.telefono||'').includes(q)||(c.email||'').toLowerCase().includes(q)) : cl;
-      document.getElementById('client-count').textContent = `${cl.length} cliente${cl.length!==1?'s':''}`;
+      const q = (query || document.getElementById('inp-search-client')?.value || '').toLowerCase();
+      const filtered = q ? cl.filter(c => c.nombre.toLowerCase().includes(q) || (c.telefono || '').includes(q) || (c.email || '').toLowerCase().includes(q)) : cl;
+      document.getElementById('client-count').textContent = `${cl.length} cliente${cl.length !== 1 ? 's' : ''}`;
       const container = document.getElementById('client-list');
 
       if (filtered.length === 0) {
-        container.innerHTML = `<div class="empty-state"><div class="empty-icon">👤</div><h3>${q?'Sin resultados':'Sin clientes'}</h3><p>${q?'No se encontraron clientes con ese criterio.':'Los clientes se guardan automáticamente al crear citas.'}</p></div>`;
+        container.innerHTML = `<div class="empty-state"><div class="empty-icon">👤</div><h3>${q ? 'Sin resultados' : 'Sin clientes'}</h3><p>${q ? 'No se encontraron clientes con ese criterio.' : 'Los clientes se guardan automáticamente al crear citas.'}</p></div>`;
         return;
       }
 
-      // Count visits per client
       const appts = cachedAppointments;
       container.innerHTML = filtered.map(c => {
-        const visits = appts.filter(a=>a.nombre.toLowerCase()===c.nombre.toLowerCase()).length;
-        const lastAppt = appts.filter(a=>a.nombre.toLowerCase()===c.nombre.toLowerCase()).sort((a,b)=>new Date(b.fecha_hora)-new Date(a.fecha_hora))[0];
+        const visits = appts.filter(a => a.nombre.toLowerCase() === c.nombre.toLowerCase()).length;
+        const lastAppt = appts.filter(a => a.nombre.toLowerCase() === c.nombre.toLowerCase()).sort((a, b) => new Date(b.fecha_hora) - new Date(a.fecha_hora))[0];
         const lastDate = lastAppt ? new Date(lastAppt.fecha_hora) : null;
-        const lastStr = lastDate ? `Última: ${lastDate.getDate()}/${lastDate.getMonth()+1}/${lastDate.getFullYear()}` : '';
-        const initials = c.nombre.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-        let ph = (c.telefono||'').replace(/\D/g,'');
-        if(ph.length===8) ph='506'+ph; else if(!ph.startsWith('506')&&ph.length>8) ph='506'+ph;
+        const lastStr = lastDate ? `Última: ${lastDate.getDate()}/${lastDate.getMonth() + 1}/${lastDate.getFullYear()}` : '';
+        const initials = c.nombre.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        const ph = formatPhone(c.telefono);
         const waUrl = `https://wa.me/${ph}`;
+        const nameEsc = esc(c.nombre).replace(/'/g, "\\'");
 
-        return `<div class="client-card" onclick="createApptForClient('${c.nombre.replace(/'/g,"\\'")}','${c.telefono||''}','${c.email||''}')">
+        return `<div class="client-card" onclick="createApptForClient('${nameEsc}','${esc(c.telefono || '')}','${esc(c.email || '')}')">
           <div class="client-avatar">${initials}</div>
           <div class="client-info">
-            <div class="cl-name">${c.nombre}</div>
-            <div class="cl-phone">📱 ${c.telefono||'Sin teléfono'} ${c.email ? `<span style="display:block;font-size:11px;color:var(--text-muted);margin-top:2px;">✉️ ${c.email}</span>` : ''}</div>
-            <div class="cl-visits">${visits} cita${visits!==1?'s':''} ${lastStr?'• '+lastStr:''}</div>
+            <div class="cl-name">${esc(c.nombre)}</div>
+            <div class="cl-phone">📱 ${esc(c.telefono || 'Sin teléfono')} ${c.email ? `<span style="display:block;font-size:11px;color:var(--text-muted);margin-top:2px;">✉️ ${esc(c.email)}</span>` : ''}</div>
+            <div class="cl-visits">${visits} cita${visits !== 1 ? 's' : ''} ${lastStr ? '• ' + lastStr : ''}</div>
           </div>
           <div class="client-actions" onclick="event.stopPropagation()">
             ${c.telefono ? `<a href="${waUrl}" target="_blank" rel="noopener" class="btn-wa" title="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>` : ''}
-            ${c.email ? `<a href="mailto:${c.email}" class="btn-mail" title="Enviar Correo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>` : ''}
-            <div class="btn-new-appt" onclick="createApptForClient('${c.nombre.replace(/'/g,"\\'")}','${c.telefono||''}','${c.email||''}')" title="Nueva cita">
+            <button type="button" class="btn-vcf" onclick="exportContactVCF('${nameEsc}','${esc(c.telefono || '')}','${esc(c.email || '')}')" title="Guardar en agenda del teléfono">📇</button>
+            ${c.email ? `<a href="mailto:${esc(c.email)}" class="btn-mail" title="Enviar Correo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>` : ''}
+            <div class="btn-new-appt" onclick="createApptForClient('${nameEsc}','${esc(c.telefono || '')}','${esc(c.email || '')}')" title="Nueva cita">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </div>
           </div>
@@ -1775,48 +2421,663 @@
     function renderSettings() {
       renderServiceList();
       const re = cachedSettings ? cachedSettings.reminder_enabled : false;
+      const pe = cachedSettings ? cachedSettings.push_enabled !== false : true;
       document.getElementById('toggle-reminder').checked = re;
+      document.getElementById('toggle-push').checked = pe;
       document.getElementById('reminder-template-area').classList.toggle('visible', re);
+      document.getElementById('push-time-area').style.display = pe ? 'block' : 'none';
       document.getElementById('reminder-msg-template').value = (cachedSettings && cachedSettings.reminder_template) || DEFAULT_REMINDER_MSG;
+      const minsSelect = document.getElementById('reminder-minutes-select');
+      if (cachedSettings && cachedSettings.reminder_minutes_before) {
+        minsSelect.value = cachedSettings.reminder_minutes_before;
+      }
     }
 
     function renderServiceList() {
-      const c=document.getElementById('service-list');
-      if(!cachedServices.length){c.innerHTML='<p style="font-size:13px;color:var(--text-muted);padding:8px 0;">No tenés servicios todavía. Agregá el primero abajo 👇</p>';return;}
-      c.innerHTML=cachedServices.map((x,i)=>`<div class="service-item"><span class="svc-emoji">${x.emoji}</span><span class="svc-name">${x.name}</span><button class="btn-delete-svc" onclick="deleteService('${x.id}')" title="Eliminar">×</button></div>`).join('');
+      const c = document.getElementById('service-list');
+      if (!cachedServices.length) { c.innerHTML = '<p style="font-size:13px;color:var(--text-muted);padding:8px 0;">No tenés servicios todavía. Agregá el primero abajo 👇</p>'; return; }
+      c.innerHTML = cachedServices.map(x =>
+        `<div class="service-item"><span class="svc-emoji">${esc(x.emoji)}</span><span class="svc-name">${esc(x.name)}</span><button class="btn-delete-svc" onclick="deleteService('${x.id}')" title="Eliminar">×</button></div>`
+      ).join('');
     }
 
     async function addService() {
-      const i=document.getElementById('inp-new-service');const n=i.value.trim();if(!n)return;
-      if(cachedServices.some(x=>x.name.toLowerCase()===n.toLowerCase())){showToast('Ese servicio ya existe',true);return;}
+      const i = document.getElementById('inp-new-service');
+      const n = i.value.trim();
+      if (!n) return;
+      if (cachedServices.some(x => x.name.toLowerCase() === n.toLowerCase())) { showToast('Ese servicio ya existe', true); return; }
       const svc = await insertService(n);
-      if (svc) { i.value=''; renderServiceList(); showToast(`"${n}" agregado`); }
+      if (svc) { i.value = ''; renderServiceList(); showToast(`"${n}" agregado`); }
       else { showToast('Error al agregar servicio', true); }
     }
 
     async function deleteService(id) {
       const svc = cachedServices.find(s => s.id === id);
+      if (!confirm(`¿Eliminar el servicio "${svc?.name || ''}"?`)) return;
       const ok = await removeService(id);
       if (ok) { renderServiceList(); showToast(`"${svc?.name || 'Servicio'}" eliminado`); }
     }
 
+    function confirmClearAll() {
+      if (!confirm('¿Seguro que deseas borrar TODAS las citas?\n\nEsta acción no se puede deshacer.')) return;
+      if (!confirm('⚠️ ÚLTIMA CONFIRMACIÓN: Se borrarán todas las citas permanentemente. ¿Continuar?')) return;
+      clearAllData();
+    }
+
     async function clearAllData() {
       const ok = await deleteAllAppointments();
-      if (ok) { await fetchAppointments(); renderDashboard(); showToast('Todas las citas eliminadas'); }
+      if (ok) { await fetchAppointments(); renderDashboard(); renderClients(); showToast('Todas las citas eliminadas'); }
       else { showToast('Error al eliminar citas', true); }
+    }
+
+    // ═══════════════════════════════════════════
+    // NATIVE SOUND ENGINE (Web Audio API)
+    // ═══════════════════════════════════════════
+    const SoundEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const Cls = window.AudioContext || window.webkitAudioContext;
+          if (Cls) this.ctx = new Cls();
+        }
+      },
+      playTone(freq, duration, type = 'sine', gainVal = 0.12) {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {}
+      },
+      tap() { this.playTone(900, 0.04, 'sine', 0.06); },
+      success() {
+        this.playTone(587.33, 0.09, 'sine', 0.1);
+        setTimeout(() => this.playTone(880, 0.22, 'sine', 0.12), 80);
+      },
+      voiceStart() {
+        this.playTone(440, 0.08, 'sine', 0.1);
+        setTimeout(() => this.playTone(660, 0.14, 'sine', 0.1), 70);
+      },
+      voiceEnd() {
+        this.playTone(660, 0.08, 'sine', 0.1);
+        setTimeout(() => this.playTone(440, 0.14, 'sine', 0.1), 70);
+      },
+      delete() {
+        this.playTone(320, 0.1, 'sawtooth', 0.08);
+      }
+    };
+
+    // ═══════════════════════════════════════════
+    // AI VOICE MAGIC (Speech Recognition & NLP)
+    // ═══════════════════════════════════════════
+    let speechRecognition = null;
+    let isVoiceRecording = false;
+    let pendingVoiceResult = null;
+
+    function openVoiceMagic() {
+      SoundEngine.tap();
+      if (navigator.vibrate) navigator.vibrate(30);
+      document.getElementById('voice-sheet-backdrop').classList.add('open');
+      document.getElementById('voice-sheet').classList.add('open');
+      resetVoiceUI();
+    }
+
+    function closeVoiceMagic() {
+      if (isVoiceRecording) stopVoiceRecording();
+      document.getElementById('voice-sheet-backdrop').classList.remove('open');
+      document.getElementById('voice-sheet').classList.remove('open');
+    }
+
+    function resetVoiceUI() {
+      document.getElementById('voice-orb').classList.remove('recording');
+      document.getElementById('voice-status-text').textContent = 'Tocá el micrófono para hablar';
+      document.getElementById('voice-hint-text').textContent = '"Corte para Juan mañana a las 4 de la tarde"';
+      document.getElementById('voice-transcript-box').style.display = 'none';
+      document.getElementById('voice-transcript-text').textContent = '';
+      document.getElementById('voice-parsed-card').style.display = 'none';
+      document.getElementById('inp-voice-text').value = '';
+      pendingVoiceResult = null;
+    }
+
+    function toggleVoiceRecording() {
+      if (isVoiceRecording) {
+        stopVoiceRecording();
+      } else {
+        startVoiceRecording();
+      }
+    }
+
+    function startVoiceRecording() {
+      const SpeechCls = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechCls) {
+        showToast('El navegador no soporta reconocimiento de voz. Podés escribirlo abajo 👇', true);
+        document.getElementById('inp-voice-text').focus();
+        return;
+      }
+
+      try {
+        if (!speechRecognition) {
+          speechRecognition = new SpeechCls();
+          speechRecognition.lang = 'es-CR';
+          speechRecognition.continuous = false;
+          speechRecognition.interimResults = true;
+
+          speechRecognition.onstart = () => {
+            isVoiceRecording = true;
+            SoundEngine.voiceStart();
+            if (navigator.vibrate) navigator.vibrate(40);
+            document.getElementById('voice-orb').classList.add('recording');
+            document.getElementById('voice-status-text').textContent = 'Escuchando... Hablá ahora';
+            document.getElementById('voice-transcript-box').style.display = 'block';
+          };
+
+          speechRecognition.onresult = (e) => {
+            let interim = '';
+            let final = '';
+            for (let i = e.resultIndex; i < e.results.length; ++i) {
+              if (e.results[i].isFinal) {
+                final += e.results[i][0].transcript;
+              } else {
+                interim += e.results[i][0].transcript;
+              }
+            }
+            const spoken = final || interim;
+            document.getElementById('voice-transcript-text').textContent = spoken;
+            if (final) {
+              processVoiceSpeech(final);
+            }
+          };
+
+          speechRecognition.onerror = (err) => {
+            console.warn('Speech recognition error:', err);
+            isVoiceRecording = false;
+            document.getElementById('voice-orb').classList.remove('recording');
+            document.getElementById('voice-status-text').textContent = 'No se escuchó con claridad. Tocá de nuevo';
+          };
+
+          speechRecognition.onend = () => {
+            isVoiceRecording = false;
+            document.getElementById('voice-orb').classList.remove('recording');
+            SoundEngine.voiceEnd();
+          };
+        }
+
+        speechRecognition.start();
+      } catch (err) {
+        console.error('Speech recognition start failed:', err);
+        isVoiceRecording = false;
+        document.getElementById('voice-orb').classList.remove('recording');
+      }
+    }
+
+    function stopVoiceRecording() {
+      if (speechRecognition && isVoiceRecording) {
+        try { speechRecognition.stop(); } catch (e) {}
+      }
+      isVoiceRecording = false;
+      document.getElementById('voice-orb').classList.remove('recording');
+      SoundEngine.voiceEnd();
+    }
+
+    function processVoiceSpeech(text) {
+      const parsed = parseAppointmentVoiceText(text);
+      if (parsed) {
+        displayParsedVoiceResult(parsed);
+      }
+    }
+
+    function parseAndPreviewText(text) {
+      if (!text || !text.trim()) return;
+      document.getElementById('voice-transcript-box').style.display = 'block';
+      document.getElementById('voice-transcript-text').textContent = text;
+      const parsed = parseAppointmentVoiceText(text);
+      if (parsed) {
+        displayParsedVoiceResult(parsed);
+      }
+    }
+
+    function parseAppointmentVoiceText(raw) {
+      if (!raw) return null;
+      const clean = raw.trim();
+      const lower = clean.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      // 1. Extraer nombre
+      let name = null;
+      const nameTriggers = ['para ', 'con ', 'cliente ', 'cita de ', 'a nombre de '];
+      for (const t of nameTriggers) {
+        if (lower.includes(t)) {
+          const after = lower.split(t)[1].trim();
+          const words = after.split(/\s+/);
+          if (words.length > 0 && words[0]) {
+            name = words[0];
+            if (words.length > 1 && !['manana', 'hoy', 'el', 'a', 'las', 'para', 'de', 'del', 'pasado'].includes(words[1])) {
+              name += ' ' + words[1];
+            }
+            name = name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            break;
+          }
+        }
+      }
+
+      // 2. Extraer servicio
+      let service = null;
+      if (cachedServices && cachedServices.length > 0) {
+        for (const s of cachedServices) {
+          const normSvc = s.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          if (lower.includes(normSvc)) { service = s.name; break; }
+        }
+      }
+      if (!service) {
+        const fallbacks = [
+          { t: 'corte', n: 'Corte de Cabello' },
+          { t: 'barba', n: 'Afeitado de Barba' },
+          { t: 'tinte', n: 'Tinte de Cabello' },
+          { t: 'limpieza', n: 'Limpieza' },
+          { t: 'dental', n: 'Limpieza Dental' },
+          { t: 'unas', n: 'Manicura' },
+          { t: 'masaje', n: 'Masaje' },
+          { t: 'facial', n: 'Tratamiento Facial' },
+          { t: 'consulta', n: 'Consulta' },
+        ];
+        for (const f of fallbacks) {
+          if (lower.includes(f.t)) { service = f.n; break; }
+        }
+      }
+
+      // 3. Extraer fecha
+      const now = new Date();
+      let targetDate = new Date(now);
+      targetDate.setHours(10, 0, 0, 0);
+
+      if (lower.includes('pasado manana')) {
+        targetDate.setDate(now.getDate() + 2);
+      } else if (lower.includes('manana')) {
+        targetDate.setDate(now.getDate() + 1);
+      } else if (lower.includes('hoy')) {
+        // hoy
+      } else {
+        const days = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+        for (let i = 0; i < days.length; i++) {
+          if (lower.includes(days[i])) {
+            let diff = (i - now.getDay() + 7) % 7;
+            if (diff === 0) diff = 7;
+            targetDate.setDate(now.getDate() + diff);
+            break;
+          }
+        }
+      }
+
+      // 4. Extraer hora
+      let hour = 10;
+      let minute = 0;
+      const timeRegex = /(?:a las?|a la)\s*(\d{1,2})(?::(\d{2})|\s*(?:y media|y treinta))?(?:\s*(am|pm|de la manana|de la tarde|de la noche))?/i;
+      const tm = lower.match(timeRegex);
+      if (tm) {
+        hour = parseInt(tm[1], 10);
+        if (tm[2]) minute = parseInt(tm[2], 10);
+        else if (tm[0].includes('media') || tm[0].includes('treinta')) minute = 30;
+
+        const period = tm[3] || '';
+        if ((period.includes('pm') || period.includes('tarde') || period.includes('noche')) && hour < 12) hour += 12;
+        else if ((period.includes('am') || period.includes('manana')) && hour === 12) hour = 0;
+        else if (!period && hour >= 1 && hour <= 7) hour += 12;
+      } else {
+        const sm = lower.match(/(\d{1,2})\s*(pm|de la tarde|de la noche)/i);
+        if (sm) {
+          hour = parseInt(sm[1], 10);
+          if (hour < 12) hour += 12;
+        }
+      }
+      targetDate.setHours(hour, minute, 0, 0);
+
+      return {
+        name: name || 'Cliente',
+        service: service || (cachedServices[0] ? cachedServices[0].name : 'Corte Clásico'),
+        dateTime: targetDate,
+        rawText: clean
+      };
+    }
+
+    function displayParsedVoiceResult(p) {
+      pendingVoiceResult = p;
+      document.getElementById('vp-name').textContent = p.name;
+      document.getElementById('vp-service').textContent = p.service;
+
+      const dateStr = p.dateTime.toLocaleDateString('es-CR', { weekday: 'short', day: 'numeric', month: 'short' });
+      let h = p.dateTime.getHours(); const m = String(p.dateTime.getMinutes()).padStart(2, '0');
+      const pr = h >= 12 ? 'PM' : 'AM'; if (h > 12) h -= 12; if (h === 0) h = 12;
+      const timeStr = `${h}:${m} ${pr}`;
+
+      document.getElementById('vp-date').textContent = dateStr;
+      document.getElementById('vp-time').textContent = timeStr;
+      document.getElementById('voice-parsed-card').style.display = 'flex';
+      document.getElementById('voice-status-text').textContent = '✨ Cita detectada con éxito';
+      SoundEngine.success();
+      if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
+    }
+
+    function applyVoiceAppointment() {
+      if (!pendingVoiceResult) return;
+      closeVoiceMagic();
+      switchTab('create');
+      document.getElementById('inp-name').value = pendingVoiceResult.name;
+      document.getElementById('inp-service').value = pendingVoiceResult.service;
+
+      const dt = pendingVoiceResult.dateTime;
+      const o = dt.getTimezoneOffset() * 60000;
+      const localIso = new Date(dt.getTime() - o).toISOString().slice(0, 16);
+      document.getElementById('inp-datetime').value = localIso;
+
+      const existing = cachedClients.find(c => c.nombre.toLowerCase() === pendingVoiceResult.name.toLowerCase());
+      if (existing && existing.telefono) {
+        document.getElementById('inp-phone').value = existing.telefono;
+        onPhoneInput(existing.telefono);
+      }
+
+      showToast(`✨ Datos aplicados: ${pendingVoiceResult.name} — ${pendingVoiceResult.service}`);
+      SoundEngine.success();
+      if (navigator.vibrate) navigator.vibrate(50);
+    }
+
+    // ═══════════════════════════════════════════
+    // PHONE CONTACTS & VCARD EXPORT
+    // ═══════════════════════════════════════════
+    async function pickNativeContact() {
+      SoundEngine.tap();
+      if ('contacts' in navigator && 'ContactsManager' in window) {
+        try {
+          const props = ['name', 'tel'];
+          const contacts = await navigator.contacts.select(props, { multiple: false });
+          if (contacts && contacts.length > 0) {
+            const c = contacts[0];
+            const name = c.name && c.name[0] ? c.name[0] : '';
+            const phone = c.tel && c.tel[0] ? c.tel[0] : '';
+            if (name) document.getElementById('inp-name').value = name;
+            if (phone) {
+              document.getElementById('inp-phone').value = phone;
+              onPhoneInput(phone);
+            }
+            showToast(`Contacto cargado: ${name}`);
+            SoundEngine.success();
+            if (navigator.vibrate) navigator.vibrate(40);
+            return;
+          }
+        } catch (e) {
+          console.log('Contacts picker cancelled or error:', e);
+        }
+      }
+      openClientPicker();
+    }
+
+    function openClientPicker() {
+      document.getElementById('client-picker-backdrop').classList.add('open');
+      document.getElementById('client-picker-sheet').classList.add('open');
+      renderQuickClientList('');
+      document.getElementById('inp-quick-search').value = '';
+      setTimeout(() => document.getElementById('inp-quick-search').focus(), 300);
+    }
+
+    function closeClientPicker() {
+      document.getElementById('client-picker-backdrop').classList.remove('open');
+      document.getElementById('client-picker-sheet').classList.remove('open');
+    }
+
+    function renderQuickClientList(query) {
+      const q = (query || '').toLowerCase();
+      const filtered = q ? cachedClients.filter(c => c.nombre.toLowerCase().includes(q) || (c.telefono || '').includes(q)) : cachedClients;
+      const c = document.getElementById('quick-client-list');
+      if (filtered.length === 0) {
+        c.innerHTML = '<p style="font-size:13px;color:var(--text-muted);text-align:center;padding:16px;">Sin resultados</p>';
+        return;
+      }
+      c.innerHTML = filtered.map(cl => {
+        const nameEsc = esc(cl.nombre).replace(/'/g, "\\'");
+        const telEsc = esc(cl.telefono || '');
+        return `<div class="ac-item" style="border-radius:var(--radius-sm);padding:10px 14px;background:var(--surface-card);" onclick="selectQuickClient('${nameEsc}','${telEsc}')">
+          <span class="ac-name">${esc(cl.nombre)}</span>
+          <span class="ac-phone">📱 ${telEsc || 'Sin teléfono'}</span>
+        </div>`;
+      }).join('');
+    }
+
+    function selectQuickClient(name, phone) {
+      document.getElementById('inp-name').value = name;
+      if (phone) {
+        document.getElementById('inp-phone').value = phone;
+        onPhoneInput(phone);
+      }
+      closeClientPicker();
+      SoundEngine.tap();
+      if (navigator.vibrate) navigator.vibrate(30);
+    }
+
+    function saveCurrentFormContactVCF() {
+      const name = document.getElementById('inp-name').value.trim();
+      const phone = document.getElementById('inp-phone').value.trim();
+      const email = document.getElementById('inp-email').value.trim();
+      if (!name) {
+        showToast('Escribí el nombre del cliente primero', true);
+        return;
+      }
+      exportContactVCF(name, phone, email);
+    }
+
+    function exportContactVCF(name, phone, email) {
+      const cleanPhone = formatPhone(phone);
+      const vcfData = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        `FN:${name}`,
+        cleanPhone ? `TEL;TYPE=CELL:+${cleanPhone}` : '',
+        email ? `EMAIL:${email}` : '',
+        'NOTE:Cliente guardado desde Calendario Inteligente',
+        'END:VCARD'
+      ].filter(Boolean).join('\r\n');
+
+      const blob = new Blob([vcfData], { type: 'text/vcard;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${name.replace(/[^a-zA-Z0-9]/g, '_')}.vcf`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+      showToast(`📇 Contacto preparado: ${name}`);
+      SoundEngine.success();
+      if (navigator.vibrate) navigator.vibrate(40);
+    }
+
+    // ═══════════════════════════════════════════
+    // APPOINTMENT ACTION SHEET (MOBILE)
+    // ═══════════════════════════════════════════
+    let currentActionApptId = null;
+
+    function openActionSheet(apptId) {
+      const appt = cachedAppointments.find(a => a.id === apptId);
+      if (!appt) return;
+      currentActionApptId = apptId;
+      SoundEngine.tap();
+      if (navigator.vibrate) navigator.vibrate(30);
+
+      const dt = new Date(appt.fecha_hora);
+      let h = dt.getHours(); const m = String(dt.getMinutes()).padStart(2, '0');
+      const p = h >= 12 ? 'PM' : 'AM'; if (h > 12) h -= 12; if (h === 0) h = 12;
+      const dateStr = dt.toLocaleDateString('es-CR', { weekday: 'short', day: 'numeric', month: 'short' });
+      const timeStr = `${h}:${m} ${p}`;
+      const initials = appt.nombre.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      const ph = formatPhone(appt.telefono);
+      const wm = encodeURIComponent(`Hola ${appt.nombre}, te recordamos tu cita para *${appt.servicio}* el ${dateStr} a las ${timeStr}.\n\n¿Confirmás tu asistencia?\n👉 Respondé *SI* para confirmar\n👉 Respondé *NO* para cancelar`);
+
+      const content = document.getElementById('action-sheet-content');
+      content.innerHTML = `
+        <div class="sheet-appt-summary">
+          <div class="sas-avatar">${initials}</div>
+          <div class="sas-info">
+            <div class="sas-name">${esc(appt.nombre)}</div>
+            <div class="sas-meta">${esc(appt.servicio)} · ${dateStr}, ${timeStr}</div>
+            <div style="margin-top:4px;"><span class="appt-status-badge badge-${appt.estado}">● ${appt.estado.toUpperCase()}</span></div>
+          </div>
+        </div>
+
+        <div class="action-sheet-options">
+          ${appt.telefono ? `
+            <a href="whatsapp://send?phone=${ph}&text=${wm}" class="action-option-btn btn-wa-action" onclick="closeActionSheet()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              <span>Enviar WhatsApp al Cliente</span>
+            </a>
+            <a href="tel:+${ph}" class="action-option-btn" onclick="closeActionSheet()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span>Llamar por Teléfono</span>
+            </a>
+            <button type="button" class="action-option-btn" onclick="exportContactVCF('${esc(appt.nombre).replace(/'/g, "\\'")}','${ph}','${esc(appt.email || '')}'); closeActionSheet();">
+              <span>📇 Guardar Contacto en el Teléfono</span>
+            </button>
+          ` : ''}
+          ${appt.email ? `
+            <a href="mailto:${esc(appt.email)}?subject=${encodeURIComponent('Recordatorio de Cita - ' + appt.servicio)}&body=${wm}" class="action-option-btn" onclick="closeActionSheet()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <span>Enviar Correo</span>
+            </a>
+          ` : ''}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+            <button type="button" class="action-option-btn" style="justify-content:center;background:rgba(78,205,196,0.15);color:var(--accent-teal);" onclick="changeStatusFromSheet('confirmado')">
+              ✅ Confirmar
+            </button>
+            <button type="button" class="action-option-btn" style="justify-content:center;background:rgba(244,114,182,0.15);color:var(--accent-rose);" onclick="changeStatusFromSheet('cancelado')">
+              ❌ Cancelar
+            </button>
+          </div>
+          <button type="button" class="action-option-btn btn-danger-action" onclick="deleteSingleAppointmentFromSheet()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Eliminar Cita</span>
+          </button>
+        </div>
+      `;
+
+      document.getElementById('action-sheet-backdrop').classList.add('open');
+      document.getElementById('action-sheet').classList.add('open');
+    }
+
+    function closeActionSheet() {
+      document.getElementById('action-sheet-backdrop').classList.remove('open');
+      document.getElementById('action-sheet').classList.remove('open');
+      currentActionApptId = null;
+    }
+
+    async function changeStatusFromSheet(newStatus) {
+      if (!currentActionApptId) return;
+      const ok = await updateAppointmentStatus(currentActionApptId, newStatus);
+      if (ok) {
+        closeActionSheet();
+        renderAppointments();
+        showToast(`Cita marcada como ${newStatus}`);
+        SoundEngine.success();
+      } else {
+        showToast('Error al actualizar estado', true);
+      }
+    }
+
+    async function deleteSingleAppointmentFromSheet() {
+      if (!currentActionApptId) return;
+      if (!confirm('¿Seguro que deseas eliminar esta cita?')) return;
+      const { error } = await sb.from('user_appointments').delete().eq('id', currentActionApptId).eq('user_id', currentUser.id);
+      if (!error) {
+        cachedAppointments = cachedAppointments.filter(a => a.id !== currentActionApptId);
+        closeActionSheet();
+        renderAppointments();
+        renderClients();
+        showToast('Cita eliminada');
+        SoundEngine.delete();
+      } else {
+        showToast('Error al eliminar cita', true);
+      }
+    }
+
+    // ═══════════════════════════════════════════
+    // NATIVE MOBILE PULL-TO-REFRESH
+    // ═══════════════════════════════════════════
+    function setupPullToRefresh() {
+      const ca = document.getElementById('content-area');
+      const ptr = document.getElementById('ptr-indicator');
+      const ptrText = document.getElementById('ptr-text');
+      if (!ca || !ptr) return;
+
+      let startY = 0;
+      let pulling = false;
+
+      ca.addEventListener('touchstart', (e) => {
+        if (ca.scrollTop <= 0) {
+          startY = e.touches[0].clientY;
+          pulling = true;
+        } else {
+          pulling = false;
+        }
+      }, { passive: true });
+
+      ca.addEventListener('touchmove', (e) => {
+        if (!pulling) return;
+        const currentY = e.touches[0].clientY;
+        const diff = currentY - startY;
+        if (diff > 10 && ca.scrollTop <= 0) {
+          const h = Math.min(diff * 0.45, 60);
+          ptr.style.height = `${h}px`;
+          ptr.classList.add('pulling');
+          if (h > 45) {
+            ptrText.textContent = 'Soltá para actualizar...';
+          } else {
+            ptrText.textContent = 'Deslizá para actualizar...';
+          }
+        }
+      }, { passive: true });
+
+      ca.addEventListener('touchend', async (e) => {
+        if (!pulling) return;
+        pulling = false;
+        const currentHeight = parseFloat(ptr.style.height || '0');
+        if (currentHeight > 45) {
+          ptr.classList.add('refreshing');
+          ptrText.textContent = 'Actualizando...';
+          SoundEngine.tap();
+          if (navigator.vibrate) navigator.vibrate(30);
+
+          try {
+            await Promise.all([fetchAppointments(), fetchClients(), fetchServices(), fetchSettings()]);
+            renderDashboard();
+            renderClients();
+            showToast('✅ Datos actualizados');
+            SoundEngine.success();
+          } catch (err) {
+            console.warn('Pull-to-refresh error:', err);
+          }
+        }
+        ptr.style.height = '0px';
+        ptr.classList.remove('pulling');
+        ptr.classList.remove('refreshing');
+      });
     }
 
     // ═══════════════════════════════════════════
     // APP INIT
     // ═══════════════════════════════════════════
     async function initApp() {
+      SoundEngine.init();
+      setupPullToRefresh();
       updateGreeting();
       setDefaultDateTime();
+      updateOnlineStatus();
+      registerServiceWorker();
 
-      // Migrate local data if exists
       const didMigrate = await migrateLocalData();
 
-      // Fetch all data from Supabase
       await Promise.all([
         fetchAppointments(),
         fetchClients(),
@@ -1825,13 +3086,7 @@
       ]);
 
       if (didMigrate) {
-        // Refetch after migration to get the server-side IDs
-        await Promise.all([
-          fetchAppointments(),
-          fetchClients(),
-          fetchServices(),
-          fetchSettings(),
-        ]);
+        await Promise.all([fetchAppointments(), fetchClients(), fetchServices(), fetchSettings()]);
         const mb = document.getElementById('migration-banner-container');
         mb.innerHTML = '<div class="migration-banner">✅ Tus datos locales fueron migrados a la nube exitosamente.</div>';
         setTimeout(() => { mb.innerHTML = ''; }, 6000);
@@ -1839,6 +3094,19 @@
 
       renderDashboard();
       renderServiceChips();
+      scheduleLocalReminders();
+
+      // Request notification permission after a delay (better UX)
+      if (cachedSettings && cachedSettings.push_enabled !== false) {
+        setTimeout(async () => {
+          if ('Notification' in window && Notification.permission === 'default') {
+            await requestNotificationPermission();
+          }
+        }, 3000);
+      }
+
+      // Update greeting every minute
+      setInterval(updateGreeting, 60000);
     }
   </script>
 </body>
